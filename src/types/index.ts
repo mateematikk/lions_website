@@ -46,15 +46,22 @@ export interface FAQItem {
   answer: string;
 }
 
-export interface ContactInfo {
+export interface Location {
+  id: string;
+  district: string;
   address: string;
+  lat: number;
+  lng: number;
+  mapUrl: string;
+  mapEmbed: string;
+}
+
+export interface ContactInfo {
   phone: string;
   email: string;
   telegram: string;
   instagram: string;
   facebook: string;
-  mapUrl: string;
-  mapEmbed: string;
   workingHours: string;
 }
 

@@ -1,26 +1,177 @@
 @import "tailwindcss";
 
+/* ─── Design Tokens ─── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --gold: #C8A44D;
+  --gold-light: #D4B76A;
+  --gold-dark: #A8873A;
+  --black: #0A0A0A;
+  --black-pure: #000000;
+  --dark: #111111;
+  --dark-gray: #1A1A1A;
+  --dark-gray-2: #222222;
+  --medium-gray: #333333;
+  --light-gray: #999999;
+  --white: #FFFFFF;
+  --white-soft: #F5F5F5;
+
+  --background: var(--black);
+  --foreground: var(--white);
 }
 
+/* ─── TailwindCSS v4 Theme Extension ─── */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-gold: var(--gold);
+  --color-gold-light: var(--gold-light);
+  --color-gold-dark: var(--gold-dark);
+  --color-dark: var(--dark);
+  --color-dark-gray: var(--dark-gray);
+  --color-dark-gray-2: var(--dark-gray-2);
+  --color-medium-gray: var(--medium-gray);
+  --color-light-gray: var(--light-gray);
+  --color-black-pure: var(--black-pure);
+
+  --font-heading: var(--font-oswald);
+  --font-body: var(--font-inter);
+
+  /* Animation durations */
+  --animate-fade-in: fade-in 0.6s ease-out forwards;
+  --animate-slide-up: slide-up 0.6s ease-out forwards;
+  --animate-slide-down: slide-down 0.4s ease-out forwards;
+  --animate-scale-in: scale-in 0.5s ease-out forwards;
+  --animate-pulse-gold: pulse-gold 2s ease-in-out infinite;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ─── Keyframes ─── */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-down {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes pulse-gold {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(200, 164, 77, 0.4); }
+  50% { box-shadow: 0 0 20px 4px rgba(200, 164, 77, 0.2); }
+}
+
+/* ─── Base Styles ─── */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--black);
+  color: var(--white);
+  font-family: var(--font-body), system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+/* ─── Custom Scrollbar ─── */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--medium-gray);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gold);
+}
+
+/* ─── Selection ─── */
+::selection {
+  background: var(--gold);
+  color: var(--black);
+}
+
+/* ─── Glassmorphism Utility ─── */
+.glass {
+  background: rgba(17, 17, 17, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(200, 164, 77, 0.1);
+}
+
+.glass-light {
+  background: rgba(26, 26, 26, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* ─── Gold Gradient Text ─── */
+.text-gradient-gold {
+  background: linear-gradient(135deg, var(--gold-light), var(--gold), var(--gold-dark));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Gold Border Gradient ─── */
+.border-gradient-gold {
+  border-image: linear-gradient(135deg, var(--gold-light), var(--gold-dark)) 1;
+}
+
+/* ─── Hover Card Effect ─── */
+.card-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(200, 164, 77, 0.15);
+}
+
+/* ─── Section Divider ─── */
+.section-divider {
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--gold-light), var(--gold-dark));
+  margin: 0 auto;
+  border-radius: 2px;
+}
+
+/* ─── Image Overlay ─── */
+.image-overlay {
+  position: relative;
+  overflow: hidden;
+}
+
+.image-overlay::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(10, 10, 10, 0.3),
+    rgba(10, 10, 10, 0.8)
+  );
+  transition: opacity 0.3s ease;
+}
+
+.image-overlay:hover::after {
+  opacity: 0.6;
 }
