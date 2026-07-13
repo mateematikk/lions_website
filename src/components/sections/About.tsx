@@ -7,7 +7,7 @@ import SectionHeading from "@/components/shared/SectionHeading";
 import { useLanguage } from "@/context/LanguageContext";
 
 export default function About() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   return (
     <SectionWrapper id="about">
@@ -44,9 +44,9 @@ export default function About() {
             className="grid grid-cols-3 gap-4 pt-6"
           >
             {[
-              { value: "7+", label: t.language === "uk" ? "років досвіду" : "лет опыта" },
-              { value: "500+", label: t.language === "uk" ? "учнів" : "учеников" },
-              { value: "120+", label: t.language === "uk" ? "медалей" : "медалей" },
+              { value: "7+", label: language === "uk" ? "років досвіду" : "лет опыта" },
+              { value: "500+", label: language === "uk" ? "учнів" : "учеников" },
+              { value: "120+", label: language === "uk" ? "медалей" : "медалей" },
             ].map((stat, i) => (
               <div key={i} className="text-center">
                 <div className="font-heading text-3xl font-bold text-gradient-gold sm:text-4xl">
