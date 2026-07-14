@@ -43,12 +43,12 @@ export default function Coaches() {
             className="group overflow-hidden rounded-2xl border border-medium-gray/30 bg-dark-gray transition-all duration-300 hover:border-gold/40 hover:shadow-xl hover:shadow-gold/10"
           >
             {/* Photo */}
-            <div className="relative h-72 overflow-hidden sm:h-80">
+            <div className="relative h-80 overflow-hidden sm:h-96">
               <Image
                 src={coach.photo}
                 alt={coach.name}
                 fill
-                className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                className="object-cover object-[center_15%] transition-transform duration-500 group-hover:scale-105"
                 sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-dark-gray via-transparent to-transparent" />

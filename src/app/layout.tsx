@@ -36,10 +36,10 @@ export const metadata: Metadata = {
         url: SEO.ogImage,
         width: 1200,
         height: 630,
-        alt: "Lions Team — Школа бразильского джиу-джитсу",
+        alt: "Lions Team — Brazilian Jiu-Jitsu school",
       },
     ],
-    locale: "ru_RU",
+    locale: "en_US",
     type: "website",
   },
   twitter: {
@@ -59,7 +59,7 @@ export default function RootLayout({
 
   return (
     <html
-      lang="ru"
+      lang="en"
       className={`${inter.variable} ${oswald.variable} h-full antialiased`}
     >
       <head>

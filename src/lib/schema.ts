@@ -2,7 +2,7 @@ import { SEO, CONTACT_INFO } from "@/constants/content";
 import { locations } from "@/data/locations";
 
 export function generateSchemaOrg() {
-  const locs = locations.ru;
+  const locs = locations.en;
 
   return {
     "@context": "https://schema.org",
@@ -16,7 +16,7 @@ export function generateSchemaOrg() {
     address: locs.map((loc) => ({
       "@type": "PostalAddress",
       streetAddress: loc.address,
-      addressLocality: "Киев",
+      addressLocality: "Kyiv",
       addressCountry: "UA",
       name: loc.district,
     })),

@@ -11,9 +11,9 @@ const programColors: Record<string, string> = {
   kids: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
   teens: "bg-blue-500/20 text-blue-400 border-blue-500/30",
   adults: "bg-gold/20 text-gold border-gold/30",
-  women: "bg-pink-500/20 text-pink-400 border-pink-500/30",
   competition: "bg-red-500/20 text-red-400 border-red-500/30",
   nogi: "bg-purple-500/20 text-purple-400 border-purple-500/30",
+  mma: "bg-orange-500/20 text-orange-400 border-orange-500/30",
 };
 
 export default function Schedule() {
@@ -57,7 +57,7 @@ export default function Schedule() {
         >
           {schedule[language][activeDay]?.entries.length === 0 ? (
             <div className="rounded-2xl border border-medium-gray/30 bg-dark-gray p-12 text-center">
-              <p className="text-light-gray">{language === "uk" ? "Вихідний" : "Выходной"}</p>
+              <p className="text-light-gray">{language === "uk" ? "Вихідний" : "Day off"}</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -88,9 +88,12 @@ export default function Schedule() {
                     </span>
                   </div>
 
-                  {/* Coach */}
-                  <div className="text-sm text-light-gray sm:text-right">
-                    {entry.coach}
+                  {/* Location / Coach */}
+                  <div className="text-sm sm:text-right">
+                    <p className="font-medium text-white">{entry.location}</p>
+                    {entry.coach ? (
+                      <p className="mt-0.5 text-light-gray">{entry.coach}</p>
+                    ) : null}
                   </div>
                 </motion.div>
               ))}

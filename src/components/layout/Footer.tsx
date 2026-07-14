@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { Phone, Mail, MapPin } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
@@ -17,13 +18,16 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <Link href="#hero" className="inline-block">
-              <span className="font-heading text-2xl font-bold tracking-widest text-gradient-gold">
-                LIONS TEAM
-              </span>
+              <Image
+                src="/images/logo-transparent.png"
+                alt="Lions JiuJitsu"
+                width={200}
+                height={90}
+                className="h-12 w-auto"
+              />
             </Link>
-            <p className="mt-3 text-sm text-light-gray">{t.FOOTER.slogan}</p>
+            <p className="mt-4 text-sm text-light-gray">{t.FOOTER.slogan}</p>
             <p className="mt-1 text-sm text-light-gray">Brazilian Jiu-Jitsu</p>
-
             {/* Social Icons */}
             <div className="mt-6 flex gap-3">
               <a
@@ -65,7 +69,7 @@ export default function Footer() {
           {/* Navigation */}
           <div>
             <h4 className="font-heading text-lg font-bold uppercase tracking-wider text-white">
-              {language === "uk" ? "Навігація" : "Навигация"}
+              {language === "uk" ? "Навігація" : "Navigation"}
             </h4>
             <ul className="mt-4 space-y-2">
               {footerNavItems.map((item) => (
@@ -84,7 +88,7 @@ export default function Footer() {
           {/* Contacts */}
           <div>
             <h4 className="font-heading text-lg font-bold uppercase tracking-wider text-white">
-              {language === "uk" ? "Контакти" : "Контакты"}
+              {language === "uk" ? "Контакти" : "Contacts"}
             </h4>
             <ul className="mt-4 space-y-3">
               {locs.map((loc) => (

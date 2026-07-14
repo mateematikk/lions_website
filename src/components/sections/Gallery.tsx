@@ -8,6 +8,7 @@ import SectionWrapper from "@/components/shared/SectionWrapper";
 import SectionHeading from "@/components/shared/SectionHeading";
 import { useLanguage } from "@/context/LanguageContext";
 import { galleryImages } from "@/data/gallery";
+import InstagramPhones from "@/components/sections/Instagram";
 
 export default function Gallery() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -52,6 +53,8 @@ export default function Gallery() {
         ))}
       </div>
 
+      <InstagramPhones />
+
       {/* Lightbox */}
       <AnimatePresence>
         {selectedImage && (
@@ -65,7 +68,7 @@ export default function Gallery() {
             <button
               onClick={() => setSelectedImage(null)}
               className="absolute right-4 top-4 z-10 rounded-full p-2 text-white transition-colors hover:text-gold"
-              aria-label={language === "uk" ? "Закрити" : "Закрыть"}
+              aria-label={language === "uk" ? "Закрити" : "Close"}
             >
               <X size={28} />
             </button>
@@ -80,7 +83,7 @@ export default function Gallery() {
             >
               <Image
                 src={selectedImage}
-                alt={language === "uk" ? "Перегляд фото" : "Просмотр фото"}
+                alt={language === "uk" ? "Перегляд фото" : "Photo preview"}
                 width={1200}
                 height={800}
                 className="h-auto max-h-[85vh] w-auto rounded-2xl object-contain"

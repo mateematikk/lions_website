@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 import { Menu, X } from "lucide-react";
 import { useScrollSpy } from "@/hooks/useScrollSpy";
 import { cn } from "@/lib/utils";
@@ -46,15 +47,21 @@ export default function Navbar() {
             : "bg-transparent"
         )}
       >
-        <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+        <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
           {/* Logo */}
           <button
             onClick={() => handleNavClick("#hero")}
-            className="flex items-center gap-2"
+            className="relative flex items-center"
+            aria-label="Lions Team"
           >
-            <span className="font-heading text-xl font-bold tracking-widest text-gradient-gold sm:text-2xl">
-              LIONS TEAM
-            </span>
+            <Image
+              src="/images/logo-mark.png"
+              alt="Lions Team"
+              width={48}
+              height={48}
+              className="h-10 w-10 sm:h-11 sm:w-11"
+              priority
+            />
           </button>
 
           {/* Desktop Nav */}
@@ -86,7 +93,7 @@ export default function Navbar() {
           <div className="flex items-center gap-4">
             {/* Desktop Language Switcher */}
             <div className="relative hidden items-center gap-0.5 rounded-lg border border-gold/10 bg-black-pure/45 p-0.5 backdrop-blur-sm sm:flex">
-              {(["ru", "uk"] as const).map((lang) => (
+              {(["en", "uk"] as const).map((lang) => (
                 <button
                   key={lang}
                   onClick={() => setLanguage(lang)}
@@ -95,7 +102,7 @@ export default function Navbar() {
                     language === lang ? "text-black-pure font-black" : "text-light-gray hover:text-white"
                   )}
                 >
-                  <span className="relative z-10">{lang === "uk" ? "UA" : "RU"}</span>
+                  <span className="relative z-10">{lang === "uk" ? "UA" : "EN"}</span>
                   {language === lang && (
                     <motion.div
                       layoutId="active-lang-desktop"
@@ -116,7 +123,7 @@ export default function Navbar() {
 
             {/* Mobile Language Switcher (visible when mobile toggle is shown) */}
             <div className="relative flex items-center gap-0.5 rounded-lg border border-gold/10 bg-black-pure/45 p-0.5 backdrop-blur-sm sm:hidden">
-              {(["ru", "uk"] as const).map((lang) => (
+              {(["en", "uk"] as const).map((lang) => (
                 <button
                   key={lang}
                   onClick={() => setLanguage(lang)}
@@ -125,7 +132,7 @@ export default function Navbar() {
                     language === lang ? "text-black-pure font-black" : "text-light-gray hover:text-white"
                   )}
                 >
-                  <span className="relative z-10">{lang === "uk" ? "UA" : "RU"}</span>
+                  <span className="relative z-10">{lang === "uk" ? "UA" : "EN"}</span>
                   {language === lang && (
                     <motion.div
                       layoutId="active-lang-mobile-navbar"
@@ -140,7 +147,7 @@ export default function Navbar() {
             <button
               onClick={() => setIsMobileOpen(!isMobileOpen)}
               className="rounded-lg p-2 text-white transition-colors hover:text-gold lg:hidden"
-              aria-label={language === "uk" ? "Меню" : "Меню"}
+              aria-label={language === "uk" ? "Меню" : "Menu"}
             >
               {isMobileOpen ? <X size={24} /> : <Menu size={24} />}
             </button>

@@ -82,7 +82,7 @@ export default function EnrollmentForm({ isOpen, onClose }: EnrollmentFormProps)
             <button
               onClick={onClose}
               className="absolute right-4 top-4 rounded-full p-1 text-light-gray transition-colors hover:text-gold"
-              aria-label={language === "uk" ? "Закрити" : "Закрыть"}
+              aria-label={language === "uk" ? "Закрити" : "Close"}
             >
               <X size={24} />
             </button>
@@ -203,7 +203,7 @@ export default function EnrollmentForm({ isOpen, onClose }: EnrollmentFormProps)
                       ) : (
                         <Send size={18} />
                       )}
-                      {isSubmitting ? (language === "uk" ? "Надсилання..." : "Отправка...") : t.ENROLLMENT_FORM.submit}
+                      {isSubmitting ? (language === "uk" ? "Надсилання..." : "Sending...") : t.ENROLLMENT_FORM.submit}
                     </button>
                   </form>
                 </motion.div>

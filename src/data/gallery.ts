@@ -10,5 +10,5 @@ export const galleryImages: GalleryImage[] = [
   { id: "gallery-7", src: "/images/gallery/gallery-7.jpg", alt: "Семинар с приглашённым тренером", width: 600, height: 800 },
   { id: "gallery-8", src: "/images/gallery/gallery-8.jpg", alt: "Тренировка No-Gi", width: 800, height: 500 },
   { id: "gallery-9", src: "/images/gallery/gallery-9.jpg", alt: "Разминка перед тренировкой", width: 800, height: 600 },
-  { id: "gallery-10", src: "/images/gallery/gallery-10.jpg", alt: "Женская группа на тренировке", width: 600, height: 800 },
+  { id: "gallery-10", src: "/images/gallery/gallery-10.jpg", alt: "Тренування в Lions Team", width: 600, height: 800 },
 ];

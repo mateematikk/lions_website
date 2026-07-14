@@ -44,9 +44,9 @@ export default function About() {
             className="grid grid-cols-3 gap-4 pt-6"
           >
             {[
-              { value: "7+", label: language === "uk" ? "років досвіду" : "лет опыта" },
-              { value: "500+", label: language === "uk" ? "учнів" : "учеников" },
-              { value: "120+", label: language === "uk" ? "медалей" : "медалей" },
+              { value: "12+", label: language === "uk" ? "років досвіду" : "years of experience" },
+              { value: "200+", label: language === "uk" ? "учнів" : "students" },
+              { value: "100+", label: language === "uk" ? "медалей" : "medals" },
             ].map((stat, i) => (
               <div key={i} className="text-center">
                 <div className="font-heading text-3xl font-bold text-gradient-gold sm:text-4xl">

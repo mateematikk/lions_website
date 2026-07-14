@@ -1,54 +1,44 @@
 import type { Program } from "@/types";
 
-export const programs: Record<"ru" | "uk", Program[]> = {
-  ru: [
+export const programs: Record<"en" | "uk", Program[]> = {
+  en: [
     {
       id: "kids",
-      title: "Дети",
+      title: "Kids",
       description:
-        "Программа для детей 5-10 лет. Развитие координации, гибкости и уверенности в себе через игровую форму обучения джиу-джитсу. Безопасная среда и внимательные тренеры.",
-      shortDescription: "5-10 лет · Развитие через игру",
-      ageRange: "5-10 лет",
+        "Program for kids ages 5–10. Coordination, flexibility, and confidence through playful Jiu-Jitsu classes. A safe environment with attentive coaches.",
+      shortDescription: "Ages 5–10 · Learning through play",
+      ageRange: "Ages 5–10",
       image: "/images/programs/kids.jpg",
       icon: "Baby",
     },
     {
       id: "teens",
-      title: "Подростки",
+      title: "Teens",
       description:
-        "Группа для подростков 11-16 лет. Изучение базовой и продвинутой техники BJJ, подготовка к соревнованиям, развитие дисциплины и характера.",
-      shortDescription: "11-16 лет · Техника и характер",
-      ageRange: "11-16 лет",
+        "Group for teens ages 11–16. Basic and advanced BJJ technique, competition prep, discipline, and character building.",
+      shortDescription: "Ages 11–16 · Technique & character",
+      ageRange: "Ages 11–16",
       image: "/images/programs/teens.jpg",
       icon: "Flame",
     },
     {
       id: "adults",
-      title: "Взрослые",
+      title: "Adults",
       description:
-        "Основная программа для взрослых от 16 лет. Gi и No-Gi тренировки, техника, спарринги, физподготовка. Подходит как для начинающих, так и для опытных практиков.",
-      shortDescription: "16+ лет · Все уровни",
-      ageRange: "16+ лет",
+        "Main program for adults 16+. Gi and No-Gi training, technique, sparring, and conditioning. Suitable for beginners and experienced practitioners.",
+      shortDescription: "Ages 16+ · All levels",
+      ageRange: "Ages 16+",
       image: "/images/programs/adults.jpg",
       icon: "Swords",
     },
     {
-      id: "women",
-      title: "Женская группа",
-      description:
-        "Специальная программа для женщин. Комфортная атмосфера, адаптированные тренировки, развитие навыков самозащиты, общая физическая подготовка.",
-      shortDescription: "Для женщин · Комфорт и сила",
-      ageRange: "16+ лет",
-      image: "/images/programs/women.jpg",
-      icon: "Heart",
-    },
-    {
       id: "competition",
-      title: "Подготовка к соревнованиям",
+      title: "Competition prep",
       description:
-        "Интенсивная программа для спортсменов, готовящихся к турнирам. Усиленные тренировки, тактическая подготовка, анализ поединков и психологическая подготовка.",
-      shortDescription: "Интенсив · Путь к победе",
-      ageRange: "14+ лет",
+        "Intensive program for athletes preparing for tournaments. Harder training, tactics, match analysis, and mental preparation.",
+      shortDescription: "Intense · Path to victory",
+      ageRange: "Ages 14+",
       image: "/images/programs/competition.jpg",
       icon: "Trophy",
     },
@@ -56,9 +46,9 @@ export const programs: Record<"ru" | "uk", Program[]> = {
       id: "nogi",
       title: "No-Gi",
       description:
-        "Тренировки без кимоно (в рашгарде). Акцент на борьбу в стойке, контроль, сабмишены. Современные техники из мира соревновательного грэпплинга.",
-      shortDescription: "Без кимоно · Современный грэпплинг",
-      ageRange: "14+ лет",
+        "Training without the gi (rash guard). Focus on stand-up, control, and submissions. Modern techniques from competitive grappling.",
+      shortDescription: "No gi · Modern grappling",
+      ageRange: "Ages 14+",
       image: "/images/programs/nogi.jpg",
       icon: "Zap",
     },
@@ -88,21 +78,11 @@ export const programs: Record<"ru" | "uk", Program[]> = {
       id: "adults",
       title: "Дорослі",
       description:
-        "Основная програма для дорослих від 16 років. Gi та No-Gi тренування, техніка, спаринги, фізпідготовка. Підходить як для початківців, так і для досвідчених практиків.",
+        "Основна програма для дорослих від 16 років. Gi та No-Gi тренування, техніка, спаринги, фізпідготовка. Підходить як для початківців, так і для досвідчених практиків.",
       shortDescription: "16+ років · Всі рівні",
       ageRange: "16+ років",
       image: "/images/programs/adults.jpg",
       icon: "Swords",
-    },
-    {
-      id: "women",
-      title: "Жіноча група",
-      description:
-        "Спеціальна програма для жінок. Комфортна атмосфера, адаптоване тренування, розвиток навичок самозахисту, загальна фізична підготовка.",
-      shortDescription: "Для жінок · Комфорт та сила",
-      ageRange: "16+ років",
-      image: "/images/programs/women.jpg",
-      icon: "Heart",
     },
     {
       id: "competition",

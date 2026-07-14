@@ -71,7 +71,7 @@ export default function Contacts() {
               title={
                 language === "uk"
                   ? `Розташування Lions Team — ${active.district}`
-                  : `Расположение Lions Team — ${active.district}`
+                  : `Lions Team location — ${active.district}`
               }
               className="grayscale-[0.8] contrast-[1.2] invert-[0.9] transition-all duration-500 hover:grayscale-0 hover:contrast-100 hover:invert-0"
             />
@@ -93,7 +93,7 @@ export default function Contacts() {
             </div>
             <div>
               <p className="text-xs font-medium uppercase tracking-wider text-gold">
-                {language === "uk" ? "Адреса" : "Адрес"}
+                {language === "uk" ? "Адреса" : "Address"}
               </p>
               <AnimatePresence mode="wait">
                 <motion.div
@@ -121,7 +121,7 @@ export default function Contacts() {
             </div>
             <div>
               <p className="text-xs font-medium uppercase tracking-wider text-gold">
-                {language === "uk" ? "Телефон" : "Телефон"}
+                {language === "uk" ? "Телефон" : "Phone"}
               </p>
               <a
                 href={`tel:${t.CONTACT_INFO.phone.replace(/[^\d+]/g, "")}`}
@@ -157,7 +157,7 @@ export default function Contacts() {
             </div>
             <div>
               <p className="text-xs font-medium uppercase tracking-wider text-gold">
-                {language === "uk" ? "Час роботи" : "Время работы"}
+                {language === "uk" ? "Час роботи" : "Working hours"}
               </p>
               <p className="mt-1 text-sm text-light-gray">
                 {t.CONTACT_INFO.workingHours}
@@ -174,7 +174,7 @@ export default function Contacts() {
               className="flex items-center justify-center gap-2 rounded-xl border border-gold/40 px-6 py-3 font-heading text-sm font-bold uppercase tracking-wider text-gold transition-all duration-300 hover:bg-gold/10 hover:shadow-lg hover:shadow-gold/10"
             >
               <ExternalLink size={16} />
-              {language === "uk" ? "Прокласти маршрут" : "Построить маршрут"}
+              {language === "uk" ? "Прокласти маршрут" : "Get directions"}
             </a>
             <button
               type="button"
@@ -183,7 +183,7 @@ export default function Contacts() {
             >
               {language === "uk"
                 ? "Записатися на тренування"
-                : "Записаться на тренировку"}
+                : "Book a training session"}
             </button>
           </div>
         </motion.div>

@@ -53,7 +53,7 @@ export default function Testimonials() {
           <button
             onClick={() => scroll("left")}
             className="absolute -left-2 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-medium-gray bg-dark-gray/90 text-white shadow-lg backdrop-blur transition-all hover:border-gold hover:text-gold md:-left-5"
-            aria-label={language === "uk" ? "Попередній відгук" : "Предыдущий отзыв"}
+            aria-label={language === "uk" ? "Попередній відгук" : "Previous review"}
           >
             <ChevronLeft size={20} />
           </button>
@@ -62,7 +62,7 @@ export default function Testimonials() {
           <button
             onClick={() => scroll("right")}
             className="absolute -right-2 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-medium-gray bg-dark-gray/90 text-white shadow-lg backdrop-blur transition-all hover:border-gold hover:text-gold md:-right-5"
-            aria-label={language === "uk" ? "Наступний відгук" : "Следующий отзыв"}
+            aria-label={language === "uk" ? "Наступний відгук" : "Next review"}
           >
             <ChevronRight size={20} />
           </button>

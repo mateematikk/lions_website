@@ -3,23 +3,28 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { translations } from "@/constants/content";
 
-export type Language = "ru" | "uk";
+export type Language = "en" | "uk";
 
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: typeof translations.ru;
+  t: typeof translations.en;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLanguageState] = useState<Language>("ru");
+  const [language, setLanguageState] = useState<Language>("en");
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem("preferred-language") as Language;
-    if (saved === "ru" || saved === "uk") {
+    const saved = localStorage.getItem("preferred-language");
+    // Migrate legacy "ru" preference to English
+    if (saved === "ru") {
+      setLanguageState("en");
+      localStorage.setItem("preferred-language", "en");
+      document.documentElement.lang = "en";
+    } else if (saved === "en" || saved === "uk") {
       setLanguageState(saved);
       document.documentElement.lang = saved;
     } else {
@@ -28,7 +33,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         setLanguageState("uk");
         document.documentElement.lang = "uk";
       } else {
-        document.documentElement.lang = "ru";
+        document.documentElement.lang = "en";
       }
     }
     setMounted(true);
@@ -40,8 +45,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     document.documentElement.lang = lang;
   };
 
-  // Provide fallback translations if not mounted yet to avoid mismatch
-  const t = mounted ? translations[language] : translations.ru;
+  const t = mounted ? translations[language] : translations.en;
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage, t }}>

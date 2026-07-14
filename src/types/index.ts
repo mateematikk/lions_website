@@ -23,6 +23,7 @@ export interface ScheduleEntry {
   group: string;
   coach: string;
   programId: string;
+  location: string;
 }
 
 export interface DaySchedule {
@@ -83,4 +84,13 @@ export interface GalleryImage {
   alt: string;
   width: number;
   height: number;
+}
+
+export interface InstagramProfile {
+  id: string;
+  handle: string;
+  displayName: string;
+  url: string;
+  screenshot: string;
+  locationLabel: Record<"en" | "uk", string>;
 }

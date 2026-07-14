@@ -1,172 +1,184 @@
 import type { ContactInfo, NavItem, WhyUsItem } from "@/types";
 
 export const translations = {
-  ru: {
+  en: {
     /* ─── Navigation ─── */
     NAV_ITEMS: [
-      { id: "hero", label: "Главная", href: "#hero" },
-      { id: "why-us", label: "Преимущества", href: "#why-us" },
-      { id: "about", label: "О школе", href: "#about" },
-      { id: "programs", label: "Направления", href: "#programs" },
-      { id: "coaches", label: "Тренеры", href: "#coaches" },
-      { id: "schedule", label: "Расписание", href: "#schedule" },
-      { id: "gallery", label: "Галерея", href: "#gallery" },
-      { id: "testimonials", label: "Отзывы", href: "#testimonials" },
+      { id: "hero", label: "Home", href: "#hero" },
+      { id: "why-us", label: "Why Us", href: "#why-us" },
+      { id: "about", label: "About", href: "#about" },
+      { id: "programs", label: "Programs", href: "#programs" },
+      { id: "coaches", label: "Coaches", href: "#coaches" },
+      { id: "schedule", label: "Schedule", href: "#schedule" },
+      { id: "gallery", label: "Gallery", href: "#gallery" },
+      { id: "testimonials", label: "Reviews", href: "#testimonials" },
       { id: "faq", label: "FAQ", href: "#faq" },
-      { id: "contacts", label: "Контакты", href: "#contacts" },
+      { id: "contacts", label: "Contacts", href: "#contacts" },
     ] as NavItem[],
 
     /* ─── Hero ─── */
     HERO: {
       title: "LIONS TEAM",
       subtitle: "Brazilian Jiu-Jitsu",
-      description: "Бразильское джиу-джитсу для детей и взрослых",
-      ctaPrimary: "Записаться",
-      ctaSecondary: "Расписание",
+      description: "Brazilian Jiu-Jitsu for kids and adults",
+      ctaPrimary: "Book a class",
+      ctaSecondary: "Schedule",
     },
 
     /* ─── Why Us ─── */
     WHY_US_HEADING: {
-      title: "Почему именно мы",
-      subtitle: "Lions Team — это не просто зал, это сообщество сильных духом людей",
+      title: "Why train with us",
+      subtitle:
+        "Lions Team is more than a gym — it's a community of strong-minded people",
     },
     WHY_US_ITEMS: [
       {
         icon: "GraduationCap",
-        title: "Профессиональные тренеры",
+        title: "Professional coaches",
         description:
-          "Сертифицированные инструкторы с международным опытом и поясами IBJJF",
+          "Certified instructors with international experience and IBJJF belts",
       },
       {
         icon: "Trophy",
-        title: "Соревнования",
+        title: "Competitions",
         description:
-          "Регулярное участие в турнирах всех уровней — от городских до международных",
+          "Regular participation in tournaments of every level — from local to international",
       },
       {
         icon: "Users",
-        title: "Дружная команда",
+        title: "Supportive team",
         description:
-          "Атмосфера взаимоуважения и поддержки. Мы — семья на татами и за его пределами",
+          "An atmosphere of mutual respect and support. We are a family on and off the mats",
       },
       {
         icon: "Shield",
-        title: "Безопасные тренировки",
+        title: "Safe training",
         description:
-          "Современное оборудование, мягкое покрытие и контроль техники на каждом занятии",
+          "Modern equipment, soft mats, and technique control at every session",
       },
       {
         icon: "Layers",
-        title: "Группы любого уровня",
+        title: "Groups for every level",
         description:
-          "Программы для начинающих и продвинутых. Каждый найдёт свою группу",
+          "Programs for beginners and advanced athletes. Everyone finds their place",
       },
     ] as WhyUsItem[],
 
     /* ─── About ─── */
     ABOUT: {
-      title: "О школе",
-      subtitle: "История и философия Lions Team",
+      title: "About the school",
+      subtitle: "The history and philosophy of Lions Team",
       paragraphs: [
-        "Lions Team — это школа бразильского джиу-джитсу, основанная на принципах силы, дисциплины и уважения. Мы создали пространство, где каждый может раскрыть свой потенциал, независимо от возраста и уровня подготовки.",
-        "Наши тренеры — действующие спортсмены и сертифицированные инструкторы, которые регулярно повышают квалификацию на международных семинарах. Мы используем проверенные методики обучения, адаптированные под каждого ученика.",
-        "За годы работы мы воспитали десятки призёров городских, национальных и международных турниров. Но для нас важнее всего — видеть, как наши ученики растут не только как спортсмены, но и как личности.",
-        "Присоединяйтесь к Lions Team и станьте частью семьи, где сила сочетается с мудростью, а победы — с уважением к сопернику.",
+        "Lions Team is a Brazilian Jiu-Jitsu school built on strength, discipline, and respect. We created a space where everyone can unlock their potential, regardless of age or experience.",
+        "Our coaches are active athletes and certified instructors who regularly train at international seminars. We use proven teaching methods adapted to each student.",
+        "Over the years we have developed dozens of medalists at city, national, and international tournaments. What matters most to us is watching our students grow not only as athletes, but as people.",
+        "Join Lions Team and become part of a family where strength meets wisdom, and victories come with respect for your opponent.",
       ],
     },
 
     /* ─── Programs ─── */
     PROGRAMS_HEADING: {
-      title: "Направления",
-      subtitle: "Выберите программу, которая подходит именно вам",
+      title: "Programs",
+      subtitle: "Choose the program that fits you best",
     },
 
     /* ─── Coaches ─── */
     COACHES_HEADING: {
-      title: "Наши тренеры",
-      subtitle: "Профессионалы, которые приведут вас к результату",
+      title: "Our coaches",
+      subtitle: "Professionals who will help you get results",
     },
 
     /* ─── Schedule ─── */
     SCHEDULE_HEADING: {
-      title: "Расписание",
-      subtitle: "Актуальное расписание тренировок на неделю",
+      title: "Schedule",
+      subtitle: "Current training schedule for the week",
     },
 
     /* ─── Gallery ─── */
     GALLERY_HEADING: {
-      title: "Галерея",
-      subtitle: "Моменты из жизни нашей команды",
+      title: "Gallery",
+      subtitle: "Moments from our team's life",
+    },
+
+    /* ─── Instagram ─── */
+    INSTAGRAM_HEADING: {
+      title: "Instagram",
+      subtitle: "Follow us — Lions Team life every day",
+      follow: "Follow",
+      message: "Message",
+      posts: "posts",
+      followers: "followers",
+      following: "following",
     },
 
     /* ─── Testimonials ─── */
     TESTIMONIALS_HEADING: {
-      title: "Отзывы",
-      subtitle: "Что говорят наши ученики",
+      title: "Reviews",
+      subtitle: "What our students say",
     },
 
     /* ─── FAQ ─── */
     FAQ_HEADING: {
-      title: "Часто задаваемые вопросы",
-      subtitle: "Ответы на самые популярные вопросы",
+      title: "FAQ",
+      subtitle: "Answers to the most common questions",
     },
 
     /* ─── Contacts ─── */
     CONTACTS_HEADING: {
-      title: "Контакты",
-      subtitle: "Три зала в Киеве — Позняки, Дарница и Почайна",
+      title: "Contacts",
+      subtitle: "Gyms in Kyiv — Pozniaky, Darnytsia, and Pochaina",
     },
     CONTACT_INFO: {
       phone: "+380 (44) 123-45-67",
       email: "info@lionsteam-bjj.ua",
       telegram: "https://t.me/lionsteam_bjj",
-      instagram: "https://instagram.com/lionsteam_bjj",
+      instagram: "https://www.instagram.com/lionsjiujitsu/",
       facebook: "https://facebook.com/lionsteam.bjj",
-      workingHours: "Пн-Сб: 09:00 — 21:00 | Вс: 10:00 — 18:00",
+      workingHours: "Mon–Sat: 09:00 — 21:00 | Sun: 10:00 — 18:00",
     } as ContactInfo,
 
     /* ─── Enrollment Form ─── */
     ENROLLMENT_FORM: {
-      title: "Записаться на тренировку",
-      subtitle: "Оставьте заявку и мы свяжемся с вами в течение часа",
+      title: "Book a training session",
+      subtitle: "Leave a request and we will contact you within an hour",
       fields: {
-        name: "Ваше имя",
-        phone: "Телефон",
-        age: "Возраст",
-        program: "Направление",
-        comment: "Комментарий",
+        name: "Your name",
+        phone: "Phone",
+        age: "Age",
+        program: "Program",
+        comment: "Comment",
       },
-      submit: "Отправить заявку",
+      submit: "Send request",
       success: {
-        title: "Заявка отправлена!",
-        message: "Мы свяжемся с вами в ближайшее время",
+        title: "Request sent!",
+        message: "We will contact you shortly",
       },
     },
 
     /* ─── Footer ─── */
     FOOTER: {
-      copyright: `© ${new Date().getFullYear()} Lions Team BJJ. Все права защищены.`,
-      slogan: "Сила. Дисциплина. Уважение.",
+      copyright: `© ${new Date().getFullYear()} Lions Team BJJ. All rights reserved.`,
+      slogan: "Strength. Discipline. Respect.",
     },
 
     /* ─── SEO ─── */
     SEO: {
-      title: "Lions Team — Школа бразильского джиу-джитсу",
+      title: "Lions Team — Brazilian Jiu-Jitsu School",
       description:
-        "Lions Team — премиальная школа бразильского джиу-джитсу в Киеве. Залы на Позняках, Дарнице и Почайне. Тренировки для детей и взрослых.",
+        "Lions Team is a premium Brazilian Jiu-Jitsu school in Kyiv. Gyms in Pozniaky, Darnytsia, and Pochaina. Training for kids and adults.",
       keywords: [
-        "бразильское джиу-джитсу",
+        "Brazilian Jiu-Jitsu",
         "BJJ",
         "Lions Team",
-        "BJJ Киев",
-        "джиу-джитсу Киев",
-        "Позняки",
-        "Дарница",
-        "Почайна",
-        "единоборства",
-        "тренировки",
-        "джиу-джитсу для детей",
-        "джиу-джитсу для взрослых",
+        "BJJ Kyiv",
+        "Jiu-Jitsu Kyiv",
+        "Pozniaky",
+        "Darnytsia",
+        "Pochaina",
+        "martial arts",
+        "training",
+        "kids jiu-jitsu",
+        "adult jiu-jitsu",
       ],
       ogImage: "/images/og-image.jpg",
       url: "https://lionsteam-bjj.ua",
@@ -241,7 +253,7 @@ export const translations = {
       paragraphs: [
         "Lions Team — це школа бразильського джиу-джитсу, заснована на принципах сили, дисципліни та поваги. Ми створили простір, де кожен може розкрити свій потенціал, незалежно від віку та рівня підготовки.",
         "Наші тренери — діючі спортсмени та сертифіковані інструктори, які регулярно підвищують кваліфікацію на міжнародних семінарах. Ми використовуємо перевірені методики навчання, адаптовані під кожного учня.",
-        "За роки роботи ми виховали десятки призерів міських, національних та міжнародних турнірів. Але для нас найважливіше — бачити, как наші учні ростуть не лише як спортсмени, а й як особистості.",
+        "За роки роботи ми виховали десятки призерів міських, національних та міжнародних турнірів. Але для нас найважливіше — бачити, як наші учні ростуть не лише як спортсмени, а й як особистості.",
         "Приєднуйтесь до Lions Team і станьте частиною сім'ї, де сила поєднується з мудрістю, а перемоги — з повагою до суперника.",
       ],
     },
@@ -270,6 +282,17 @@ export const translations = {
       subtitle: "Моменти з життя нашої команди",
     },
 
+    /* ─── Instagram ─── */
+    INSTAGRAM_HEADING: {
+      title: "Instagram",
+      subtitle: "Підписуйтесь — життя Lions Team щодня",
+      follow: "Підписатися",
+      message: "Повідомлення",
+      posts: "публікацій",
+      followers: "підписників",
+      following: "підписок",
+    },
+
     /* ─── Testimonials ─── */
     TESTIMONIALS_HEADING: {
       title: "Відгуки",
@@ -285,13 +308,13 @@ export const translations = {
     /* ─── Contacts ─── */
     CONTACTS_HEADING: {
       title: "Контакти",
-      subtitle: "Три зали в Києві — Позняки, Дарниця та Почайна",
+      subtitle: "Зали в Києві — Позняки, Дарниця та Почайна",
     },
     CONTACT_INFO: {
       phone: "+380 (44) 123-45-67",
       email: "info@lionsteam-bjj.ua",
       telegram: "https://t.me/lionsteam_bjj",
-      instagram: "https://instagram.com/lionsteam_bjj",
+      instagram: "https://www.instagram.com/lionsjiujitsu/",
       facebook: "https://facebook.com/lionsteam.bjj",
       workingHours: "Пн-Сб: 09:00 — 21:00 | Нд: 10:00 — 18:00",
     } as ContactInfo,
@@ -317,7 +340,7 @@ export const translations = {
     /* ─── Footer ─── */
     FOOTER: {
       copyright: `© ${new Date().getFullYear()} Lions Team BJJ. Всі права захищені.`,
-      slogan: "Сила. Дисциплина. Уважение.", // Keeping slogan BJJ general or translate to "Сила. Дисципліна. Повага."
+      slogan: "Сила. Дисципліна. Повага.",
     },
 
     /* ─── SEO ─── */
@@ -346,19 +369,20 @@ export const translations = {
 };
 
 // Backwards compatibility / defaults
-export const NAV_ITEMS = translations.ru.NAV_ITEMS;
-export const HERO = translations.ru.HERO;
-export const WHY_US_HEADING = translations.ru.WHY_US_HEADING;
-export const WHY_US_ITEMS = translations.ru.WHY_US_ITEMS;
-export const ABOUT = translations.ru.ABOUT;
-export const PROGRAMS_HEADING = translations.ru.PROGRAMS_HEADING;
-export const COACHES_HEADING = translations.ru.COACHES_HEADING;
-export const SCHEDULE_HEADING = translations.ru.SCHEDULE_HEADING;
-export const GALLERY_HEADING = translations.ru.GALLERY_HEADING;
-export const TESTIMONIALS_HEADING = translations.ru.TESTIMONIALS_HEADING;
-export const FAQ_HEADING = translations.ru.FAQ_HEADING;
-export const CONTACTS_HEADING = translations.ru.CONTACTS_HEADING;
-export const CONTACT_INFO = translations.ru.CONTACT_INFO;
-export const ENROLLMENT_FORM = translations.ru.ENROLLMENT_FORM;
-export const FOOTER = translations.ru.FOOTER;
-export const SEO = translations.ru.SEO;
+export const NAV_ITEMS = translations.en.NAV_ITEMS;
+export const HERO = translations.en.HERO;
+export const WHY_US_HEADING = translations.en.WHY_US_HEADING;
+export const WHY_US_ITEMS = translations.en.WHY_US_ITEMS;
+export const ABOUT = translations.en.ABOUT;
+export const PROGRAMS_HEADING = translations.en.PROGRAMS_HEADING;
+export const COACHES_HEADING = translations.en.COACHES_HEADING;
+export const SCHEDULE_HEADING = translations.en.SCHEDULE_HEADING;
+export const GALLERY_HEADING = translations.en.GALLERY_HEADING;
+export const INSTAGRAM_HEADING = translations.en.INSTAGRAM_HEADING;
+export const TESTIMONIALS_HEADING = translations.en.TESTIMONIALS_HEADING;
+export const FAQ_HEADING = translations.en.FAQ_HEADING;
+export const CONTACTS_HEADING = translations.en.CONTACTS_HEADING;
+export const CONTACT_INFO = translations.en.CONTACT_INFO;
+export const ENROLLMENT_FORM = translations.en.ENROLLMENT_FORM;
+export const FOOTER = translations.en.FOOTER;
+export const SEO = translations.en.SEO;

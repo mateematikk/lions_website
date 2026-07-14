@@ -6,46 +6,59 @@ import type { Location } from "@/types";
  */
 const locationCoords = {
   pozniaky: { lat: 50.398313, lng: 30.641273 },
+  kniazhyiZaton: { lat: 50.4008, lng: 30.6216 },
   darnytsia: { lat: 50.44147, lng: 30.625823 },
   pochaina: { lat: 50.49295, lng: 30.506588 },
 } as const;
 
-function mapLinks(lat: number, lng: number, lang: "ru" | "uk") {
+function mapLinks(lat: number, lng: number, lang: "en" | "uk") {
   return {
     mapUrl: `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`,
     mapEmbed: `https://maps.google.com/maps?q=${lat},${lng}&hl=${lang}&z=16&output=embed`,
   };
 }
 
-export const locations: Record<"ru" | "uk", Location[]> = {
-  ru: [
+export const locations: Record<"en" | "uk", Location[]> = {
+  en: [
     {
       id: "pozniaky",
-      district: "Позняки",
-      address: "Киев, ул. Мишуги 2",
+      district: "Pozniaky",
+      address: "Kyiv, Myshuhy St 2",
       lat: locationCoords.pozniaky.lat,
       lng: locationCoords.pozniaky.lng,
-      ...mapLinks(locationCoords.pozniaky.lat, locationCoords.pozniaky.lng, "ru"),
+      ...mapLinks(locationCoords.pozniaky.lat, locationCoords.pozniaky.lng, "en"),
+    },
+    {
+      id: "kniazhyi-zaton",
+      district: "Pozniaky",
+      address: "Kyiv, Knyazhyi Zaton St 17v",
+      lat: locationCoords.kniazhyiZaton.lat,
+      lng: locationCoords.kniazhyiZaton.lng,
+      ...mapLinks(
+        locationCoords.kniazhyiZaton.lat,
+        locationCoords.kniazhyiZaton.lng,
+        "en"
+      ),
     },
     {
       id: "darnytsia",
-      district: "Дарница",
-      address: "Киев, Дарницкая площадь 1",
+      district: "Darnytsia",
+      address: "Kyiv, Darnytska Square 1",
       lat: locationCoords.darnytsia.lat,
       lng: locationCoords.darnytsia.lng,
       ...mapLinks(
         locationCoords.darnytsia.lat,
         locationCoords.darnytsia.lng,
-        "ru"
+        "en"
       ),
     },
     {
       id: "pochaina",
-      district: "Почайна",
-      address: "Киев, ул. Йорданская 3в",
+      district: "Pochaina",
+      address: "Kyiv, Yordanska St 4h",
       lat: locationCoords.pochaina.lat,
       lng: locationCoords.pochaina.lng,
-      ...mapLinks(locationCoords.pochaina.lat, locationCoords.pochaina.lng, "ru"),
+      ...mapLinks(locationCoords.pochaina.lat, locationCoords.pochaina.lng, "en"),
     },
   ],
   uk: [
@@ -56,6 +69,18 @@ export const locations: Record<"ru" | "uk", Location[]> = {
       lat: locationCoords.pozniaky.lat,
       lng: locationCoords.pozniaky.lng,
       ...mapLinks(locationCoords.pozniaky.lat, locationCoords.pozniaky.lng, "uk"),
+    },
+    {
+      id: "kniazhyi-zaton",
+      district: "Позняки",
+      address: "Київ, вул. Княжий Затон 17в",
+      lat: locationCoords.kniazhyiZaton.lat,
+      lng: locationCoords.kniazhyiZaton.lng,
+      ...mapLinks(
+        locationCoords.kniazhyiZaton.lat,
+        locationCoords.kniazhyiZaton.lng,
+        "uk"
+      ),
     },
     {
       id: "darnytsia",
@@ -72,7 +97,7 @@ export const locations: Record<"ru" | "uk", Location[]> = {
     {
       id: "pochaina",
       district: "Почайна",
-      address: "Київ, вул. Йорданська 3в",
+      address: "Київ, вул. Йорданська 4г",
       lat: locationCoords.pochaina.lat,
       lng: locationCoords.pochaina.lng,
       ...mapLinks(locationCoords.pochaina.lat, locationCoords.pochaina.lng, "uk"),

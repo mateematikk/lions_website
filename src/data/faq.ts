@@ -1,54 +1,54 @@
 import type { FAQItem } from "@/types";
 
-export const faqItems: Record<"ru" | "uk", FAQItem[]> = {
-  ru: [
+export const faqItems: Record<"en" | "uk", FAQItem[]> = {
+  en: [
     {
       id: "faq-1",
-      question: "Нужен ли опыт для начала занятий?",
+      question: "Do I need experience to start?",
       answer:
-        "Нет, абсолютно никакого опыта не требуется. Мы принимаем учеников любого уровня подготовки. Наши тренеры помогут вам освоить базовую технику с нуля и постепенно повышать сложность.",
+        "No experience is required at all. We welcome students of every level. Our coaches will help you learn the basics from scratch and gradually increase difficulty.",
     },
     {
       id: "faq-2",
-      question: "Что нужно взять на первую тренировку?",
+      question: "What should I bring to the first class?",
       answer:
-        "На первую тренировку достаточно взять спортивную одежду (шорты и футболка), полотенце и воду. Кимоно (ги) можно приобрести позже, на первых порах мы предоставим его бесплатно.",
+        "For the first class, sportswear (shorts and a T-shirt), a towel, and water are enough. You can get a gi later — we provide one free of charge at the beginning.",
     },
     {
       id: "faq-3",
-      question: "Есть ли пробная тренировка?",
+      question: "Is there a trial class?",
       answer:
-        "Да, первая пробная тренировка — бесплатная. Запишитесь через форму на сайте или позвоните нам, и мы подберём удобное время для вашего первого визита.",
+        "Yes, the first trial class is free. Sign up through the form on the website or call us, and we will find a convenient time for your first visit.",
     },
     {
       id: "faq-4",
-      question: "Насколько безопасно бразильское джиу-джитсу?",
+      question: "How safe is Brazilian Jiu-Jitsu?",
       answer:
-        "BJJ — одно из самых безопасных единоборств. У нас мягкое покрытие, строгий контроль техники и правила спаррингов. Тренеры всегда следят за безопасностью каждого ученика.",
+        "BJJ is one of the safest martial arts. We have soft mats, strict technique control, and sparring rules. Coaches always watch over every student's safety.",
     },
     {
       id: "faq-5",
-      question: "Сколько стоят тренировки?",
+      question: "How much does training cost?",
       answer:
-        "Стоимость зависит от выбранного абонемента. Мы предлагаем разовые посещения, абонементы на 8 и 12 занятий, а также безлимитные месячные абонементы. Свяжитесь с нами для уточнения актуальных цен.",
+        "Pricing depends on the membership you choose. We offer drop-ins, 8- and 12-class packs, and unlimited monthly memberships. Contact us for current prices.",
     },
     {
       id: "faq-6",
-      question: "С какого возраста можно заниматься детям?",
+      question: "From what age can kids train?",
       answer:
-        "Мы принимаем детей с 5 лет. Для детей 5-10 лет у нас есть специальная программа с игровыми элементами и упором на развитие координации, гибкости и дисциплины.",
+        "We accept kids from age 5. For ages 5–10 we have a special program with game elements focused on coordination, flexibility, and discipline.",
     },
     {
       id: "faq-7",
-      question: "Участвуете ли вы в соревнованиях?",
+      question: "Do you compete?",
       answer:
-        "Да, наши ученики регулярно участвуют в турнирах всех уровней — от городских до международных. У нас есть специальная соревновательная группа с усиленной подготовкой.",
+        "Yes, our students regularly compete in tournaments of every level — from local to international. We also have a dedicated competition group with intensified preparation.",
     },
     {
       id: "faq-8",
-      question: "Можно ли заниматься, если есть ограничения по здоровью?",
+      question: "Can I train with health limitations?",
       answer:
-        "Перед началом занятий мы рекомендуем проконсультироваться с врачом. Наши тренеры всегда учитывают индивидуальные особенности и могут адаптировать нагрузку под ваши возможности.",
+        "We recommend consulting a doctor before starting. Our coaches always consider individual needs and can adapt the workload to your abilities.",
     },
   ],
   uk: [
@@ -56,7 +56,7 @@ export const faqItems: Record<"ru" | "uk", FAQItem[]> = {
       id: "faq-1",
       question: "Чи потрібен досвід для початку занять?",
       answer:
-        "Ні, абсолютно ніякого досвіду не потрібно. Мы приймаємо учнів будь-якого рівня підготовки. Наші тренери допоможуть вам освоїти базову техніку з нуля і поступово підвищувати складність.",
+        "Ні, абсолютно ніякого досвіду не потрібно. Ми приймаємо учнів будь-якого рівня підготовки. Наші тренери допоможуть вам освоїти базову техніку з нуля і поступово підвищувати складність.",
     },
     {
       id: "faq-2",
