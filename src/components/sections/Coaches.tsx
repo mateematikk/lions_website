@@ -30,7 +30,7 @@ export default function Coaches() {
         subtitle={t.COACHES_HEADING.subtitle}
       />
 
-      <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-4">
         {coaches[language].map((coach, i) => (
           <motion.div
             key={coach.id}

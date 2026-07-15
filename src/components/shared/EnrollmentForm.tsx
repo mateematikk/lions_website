@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, CheckCircle2, Send, Loader2 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { programs } from "@/data/programs";
+import { locations } from "@/data/locations";
 
 interface EnrollmentFormProps {
   isOpen: boolean;
@@ -16,6 +17,7 @@ interface FormData {
   phone: string;
   age: string;
   program: string;
+  location: string;
   comment: string;
 }
 
@@ -26,10 +28,12 @@ export default function EnrollmentForm({ isOpen, onClose }: EnrollmentFormProps)
     phone: "",
     age: "",
     program: "",
+    location: "",
     comment: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -40,20 +44,31 @@ export default function EnrollmentForm({ isOpen, onClose }: EnrollmentFormProps)
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setError(null);
 
-    /* ── API-Ready: Replace this with your Telegram Bot / CRM integration ── */
-    // Example:
-    // await fetch("/api/enroll", { method: "POST", body: JSON.stringify(formData) });
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      const res = await fetch("/api/enroll", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      if (!res.ok) throw new Error(`Request failed: ${res.status}`);
 
-    setIsSubmitting(false);
-    setIsSuccess(true);
-
-    setTimeout(() => {
-      setIsSuccess(false);
-      setFormData({ name: "", phone: "", age: "", program: "", comment: "" });
-      onClose();
-    }, 3000);
+      setIsSuccess(true);
+      setTimeout(() => {
+        setIsSuccess(false);
+        setFormData({ name: "", phone: "", age: "", program: "", location: "", comment: "" });
+        onClose();
+      }, 3000);
+    } catch {
+      setError(
+        language === "uk"
+          ? "Не вдалося надіслати заявку. Спробуйте ще раз або зателефонуйте нам."
+          : "Failed to send the request. Please try again or call us."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -180,6 +195,24 @@ export default function EnrollmentForm({ isOpen, onClose }: EnrollmentFormProps)
                       </select>
                     </div>
 
+                    {/* Location */}
+                    <div>
+                      <select
+                        name="location"
+                        required
+                        value={formData.location}
+                        onChange={handleChange}
+                        className="w-full rounded-xl border border-medium-gray bg-dark-gray-2 px-4 py-3 text-white transition-colors focus:border-gold focus:outline-none appearance-none"
+                      >
+                        <option value="">{t.ENROLLMENT_FORM.fields.location}</option>
+                        {locations[language].map((loc) => (
+                          <option key={loc.id} value={loc.id}>
+                            {loc.district} — {loc.address}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
                     {/* Comment */}
                     <div>
                       <textarea
@@ -191,6 +224,12 @@ export default function EnrollmentForm({ isOpen, onClose }: EnrollmentFormProps)
                         className="w-full resize-none rounded-xl border border-medium-gray bg-dark-gray-2 px-4 py-3 text-white placeholder:text-light-gray/60 transition-colors focus:border-gold focus:outline-none"
                       />
                     </div>
+
+                    {error && (
+                      <p className="text-sm text-red-400" role="alert">
+                        {error}
+                      </p>
+                    )}
 
                     {/* Submit */}
                     <button

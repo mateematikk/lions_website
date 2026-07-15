@@ -1,14 +1,18 @@
 import type { GalleryImage } from "@/types";
 
 export const galleryImages: GalleryImage[] = [
-  { id: "gallery-1", src: "/images/gallery/gallery-1.jpg", alt: "Тренировка BJJ в Lions Team", width: 800, height: 600 },
-  { id: "gallery-2", src: "/images/gallery/gallery-2.jpg", alt: "Спарринг на тренировке", width: 600, height: 800 },
-  { id: "gallery-3", src: "/images/gallery/gallery-3.jpg", alt: "Групповое фото команды", width: 800, height: 500 },
-  { id: "gallery-4", src: "/images/gallery/gallery-4.jpg", alt: "Детская тренировка", width: 600, height: 800 },
-  { id: "gallery-5", src: "/images/gallery/gallery-5.jpg", alt: "Награждение на соревнованиях", width: 800, height: 600 },
-  { id: "gallery-6", src: "/images/gallery/gallery-6.jpg", alt: "Техника удержания", width: 800, height: 600 },
-  { id: "gallery-7", src: "/images/gallery/gallery-7.jpg", alt: "Семинар с приглашённым тренером", width: 600, height: 800 },
-  { id: "gallery-8", src: "/images/gallery/gallery-8.jpg", alt: "Тренировка No-Gi", width: 800, height: 500 },
-  { id: "gallery-9", src: "/images/gallery/gallery-9.jpg", alt: "Разминка перед тренировкой", width: 800, height: 600 },
-  { id: "gallery-10", src: "/images/gallery/gallery-10.jpg", alt: "Тренування в Lions Team", width: 600, height: 800 },
+  { id: "team-banner", src: "/images/gallery/team-banner.jpg", alt: "Команда Lions Team після тренування", width: 1600, height: 1200 },
+  { id: "throw-technique", src: "/images/gallery/throw-technique.jpg", alt: "Кидкова техніка на тренуванні", width: 853, height: 1280 },
+  { id: "team-kids-group", src: "/images/gallery/team-kids-group.jpg", alt: "Дитяча та доросла групи Lions Team", width: 1280, height: 721 },
+  { id: "sparring-guard", src: "/images/gallery/sparring-guard.jpg", alt: "Спаринг у гарді", width: 853, height: 1280 },
+  { id: "ground-sparring", src: "/images/gallery/ground-sparring.jpg", alt: "Боротьба в партері", width: 1280, height: 853 },
+  { id: "team-lineup", src: "/images/gallery/team-lineup.jpg", alt: "Спортсмени Lions Team", width: 1280, height: 853 },
+  { id: "lions-gi-back", src: "/images/gallery/lions-gi-back.jpg", alt: "Кімоно Lions Team", width: 853, height: 1280 },
+  { id: "kids-training", src: "/images/gallery/kids-training.jpg", alt: "Дитяче тренування з тренером", width: 1280, height: 853 },
+  { id: "solo-drill", src: "/images/gallery/solo-drill.jpg", alt: "Відпрацювання рухів на татамі", width: 853, height: 1280 },
+  { id: "training-stretch", src: "/images/gallery/training-stretch.jpg", alt: "Розтяжка після тренування", width: 1280, height: 853 },
+  { id: "coach-student", src: "/images/gallery/coach-student.jpg", alt: "Тренер з ученицею", width: 1280, height: 853 },
+  { id: "team-fun", src: "/images/gallery/team-fun.jpg", alt: "Команда Lions Team", width: 1280, height: 853 },
+  { id: "competition-match", src: "/images/gallery/competition-match.jpg", alt: "Поєдинок на змаганнях з джиу-джитсу", width: 1024, height: 683 },
+  { id: "team-awards", src: "/images/gallery/team-awards.jpg", alt: "Спортсмени Lions Team з нагородами", width: 768, height: 1024 },
 ];

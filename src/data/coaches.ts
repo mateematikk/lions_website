@@ -3,17 +3,18 @@ import type { Coach } from "@/types";
 export const coaches: Record<"en" | "uk", Coach[]> = {
   en: [
     {
-      id: "coach-1",
-      name: "Andrii Holubenko",
-      belt: "Purple belt",
-      beltColor: "#6B21A8",
-      photo: "/images/coaches/andrii-holubenko.jpg",
+      id: "coach-rachid",
+      name: "Rachid Imzara",
+      belt: "Black belt",
+      beltColor: "#1A1A1A",
+      photo: "/images/coaches/rachid.jpg",
       achievements: [
-        "Vice-champion of the Ukraine Jiu-Jitsu Cup 2025",
-        "Winner and medalist of many Jiu-Jitsu tournaments",
-        "Teaching experience — 3 years",
+        "Black belt awarded by Alexandro Odebrecht",
+        "Winner and medalist of international BJJ championships",
+        "Coaching experience — over 15 years",
+        "Professor of the team",
       ],
-      bio: "Coach for adult and kids groups. Active competitor.",
+      bio: "Founder of Lions Team. A man who has devoted his life to Brazilian Jiu-Jitsu.",
     },
     {
       id: "coach-2",
@@ -43,20 +44,34 @@ export const coaches: Record<"en" | "uk", Coach[]> = {
       ],
       bio: "Coach for kids, teens, and adult groups. Finds an approach to every student thanks to pedagogical education and a love for the sport.",
     },
-  ],
-  uk: [
     {
       id: "coach-1",
-      name: "Андрій Голубенко",
-      belt: "Пурпуровий пасок",
+      name: "Andrii Holubenko",
+      belt: "Purple belt",
       beltColor: "#6B21A8",
       photo: "/images/coaches/andrii-holubenko.jpg",
       achievements: [
-        "Віце-чемпіон кубку України з Jiu-Jistu 2025",
-        "Призер і переможець багатьох турнірів з Jiu-Jistu",
-        "Досвід викладання — 3 роки",
+        "Vice-champion of the Ukraine Jiu-Jitsu Cup 2025",
+        "Winner and medalist of many Jiu-Jitsu tournaments",
+        "Teaching experience — 3 years",
       ],
-      bio: "Тренер дорослих груп та дитячих груп. Діючий спортсмен.",
+      bio: "Coach for adult and kids groups. Active competitor.",
+    },
+  ],
+  uk: [
+    {
+      id: "coach-rachid",
+      name: "Рашид Імзара",
+      belt: "Чорний пасок",
+      beltColor: "#1A1A1A",
+      photo: "/images/coaches/rachid.jpg",
+      achievements: [
+        "Чорний пасок від Александро Одебрехта",
+        "Переможець і призер міжнародних чемпіонатів з BJJ",
+        "Стаж тренерства — понад 15 років",
+        "Професор команди",
+      ],
+      bio: "Засновник команди Lions Team. Людина, яка присвятила життя бразильському джиу-джитсу.",
     },
     {
       id: "coach-2",
@@ -85,6 +100,19 @@ export const coaches: Record<"en" | "uk", Coach[]> = {
         "Досвід викладання — 12 років",
       ],
       bio: "Тренер дитячих, підліткових та дорослих груп. Знаходить підхід до кожного учня завдяки педагогічній освіті та любові до спорту.",
+    },
+    {
+      id: "coach-1",
+      name: "Андрій Голубенко",
+      belt: "Пурпуровий пасок",
+      beltColor: "#6B21A8",
+      photo: "/images/coaches/andrii-holubenko.jpg",
+      achievements: [
+        "Віце-чемпіон кубку України з Jiu-Jistu 2025",
+        "Призер і переможець багатьох турнірів з Jiu-Jistu",
+        "Досвід викладання — 3 роки",
+      ],
+      bio: "Тренер дорослих груп та дитячих груп. Діючий спортсмен.",
     },
   ],
 };
