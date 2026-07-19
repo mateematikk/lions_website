@@ -1,0 +1,119 @@
+# Telegram-бот обліку відвідуваності
+
+Бот працює через webhook на Vercel. Тренери відмічають присутніх в особистому чаті з
+`@LionsBJJ_bot`, а заявки із сайту й надалі надходять у спільну Telegram-групу.
+
+## 1. Оновіть токен бота
+
+Поточний токен уже передавався відкритим текстом. У `@BotFather` виконайте `/revoke`,
+оберіть бота та отримайте новий токен. Замініть `TELEGRAM_BOT_TOKEN` локально і на
+Vercel.
+
+## 2. Створіть Google Sheet і service account
+
+1. Створіть таблицю в Google Sheets.
+2. Скопіюйте її ID з URL:
+   `https://docs.google.com/spreadsheets/d/GOOGLE_SHEET_ID/edit`.
+3. У Google Cloud Console створіть проєкт і ввімкніть **Google Sheets API**.
+4. Створіть service account та JSON-ключ.
+5. Скопіюйте з JSON поля `client_email` і `private_key`.
+6. Поділіться Google-таблицею з `client_email` service account з правом **Editor**.
+
+Команда setup автоматично створить аркуші й заголовки:
+
+- `Тренери`
+- `Групи`
+- `Учні`
+- `Відвідування`
+- `Статистика`
+
+## 3. Змінні середовища
+
+Додайте у `.env.local` і у Vercel → Settings → Environment Variables:
+
+```env
+TELEGRAM_BOT_TOKEN=новий_токен
+TELEGRAM_CHAT_ID=-100...
+TELEGRAM_WEBHOOK_SECRET=довгий_випадковий_рядок
+GOOGLE_SHEET_ID=id_таблиці
+GOOGLE_SERVICE_ACCOUNT_EMAIL=service-account@project.iam.gserviceaccount.com
+GOOGLE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+```
+
+Для `TELEGRAM_WEBHOOK_SECRET` використовуйте випадковий рядок із букв, цифр, `_` та
+`-` довжиною 32–64 символи. У Vercel позначте секрети як Sensitive.
+
+## 4. Заповніть довідники
+
+Після першого setup заповніть три аркуші. Значення `active`: `TRUE`.
+
+### Тренери
+
+| telegram_id | ім'я | location_ids | active |
+| --- | --- | --- | --- |
+| 5401968520 | Андрій Голубенко | pozniaky,kniazhyi-zaton | TRUE |
+| 123456789 | Тренер Дарниця | darnytsia | TRUE |
+| 987654321 | Адміністратор | * | TRUE |
+
+Щоб дізнатися Telegram ID, тренер надсилає боту `/start`. Якщо доступу немає, бот
+покаже його ID. `*` дозволяє працювати з усіма локаціями.
+
+Допустимі `location_ids`:
+
+- `pozniaky` — Позняки, вул. Мишуги, 2
+- `kniazhyi-zaton` — Позняки, вул. Княжий Затон, 17в
+- `darnytsia` — Дарниця, Дарницька площа, 1
+- `pochaina` — Почайна, вул. Йорданська, 4г
+
+### Групи
+
+Кожен день розкладу — окремий рядок. Для занять однієї групи повторюйте той самий
+`group_id`.
+
+| group_id | location_id | назва | день | час | active |
+| --- | --- | --- | --- | --- | --- |
+| poz-adults | pozniaky | Дорослі | Вівторок | 20:00 | TRUE |
+| poz-adults | pozniaky | Дорослі | Четвер | 20:00 | TRUE |
+| zaton-kids-bjj | kniazhyi-zaton | Діти · Jiu-Jitsu | Понеділок | 15:00 | TRUE |
+| zaton-kids-mma | kniazhyi-zaton | Діти · MMA | Понеділок | 16:00 | TRUE |
+| darn-kids | darnytsia | Діти | Вівторок | 18:00 | TRUE |
+| darn-adults | darnytsia | Дорослі | Вівторок | 19:15 | TRUE |
+| pochaina-adults | pochaina | Дорослі | Понеділок | 18:20 | TRUE |
+
+Дні можна вказувати українською (`Понеділок`), англійською (`Monday`) або числом
+`1`–`7`.
+
+### Учні
+
+| student_id | ПІБ | group_id | active |
+| --- | --- | --- | --- |
+| s-001 | Іван Петренко | poz-adults | TRUE |
+| s-002 | Олена Коваль | poz-adults | TRUE |
+| s-003 | Марія Бондар | zaton-kids-bjj | TRUE |
+
+`student_id` і `group_id` мають бути короткими, унікальними та не містити символ `|`.
+
+## 5. Деплой і реєстрація webhook
+
+Після додавання змінних зробіть Redeploy у Vercel. Потім локально, з налаштованим
+`.env.local`, виконайте:
+
+```powershell
+npm.cmd run bot:setup -- https://ваш-домен.vercel.app
+```
+
+Скрипт:
+
+1. перевірить доступ service account до Google Sheet;
+2. створить відсутні аркуші й заголовки;
+3. зареєструє захищений Telegram webhook.
+
+Після цього кожен тренер відкриває особистий чат із ботом і надсилає `/start`.
+
+## Як записуються дані
+
+Після натискання «Зберегти відвідування» бот записує рядок для кожного активного
+учня групи зі статусом `Присутній` або `Відсутній`. Повторне збереження тієї самої
+дати, часу, локації та групи оновлює рядки без дублювання. Аркуш `Статистика`
+перераховується автоматично: присутності, пропуски, загальна кількість занять,
+відсоток і дата останнього заняття.

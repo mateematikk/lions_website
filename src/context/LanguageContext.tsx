@@ -19,24 +19,27 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const saved = localStorage.getItem("preferred-language");
+    let initialLanguage: Language = "en";
+
     // Migrate legacy "ru" preference to English
     if (saved === "ru") {
-      setLanguageState("en");
       localStorage.setItem("preferred-language", "en");
-      document.documentElement.lang = "en";
     } else if (saved === "en" || saved === "uk") {
-      setLanguageState(saved);
-      document.documentElement.lang = saved;
+      initialLanguage = saved;
     } else {
       const browserLang = navigator.language.split("-")[0];
       if (browserLang === "uk" || browserLang === "ua") {
-        setLanguageState("uk");
-        document.documentElement.lang = "uk";
-      } else {
-        document.documentElement.lang = "en";
+        initialLanguage = "uk";
       }
     }
-    setMounted(true);
+
+    document.documentElement.lang = initialLanguage;
+    const timeoutId = window.setTimeout(() => {
+      setLanguageState(initialLanguage);
+      setMounted(true);
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, []);
 
   const setLanguage = (lang: Language) => {
