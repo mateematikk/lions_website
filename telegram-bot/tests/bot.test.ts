@@ -9,6 +9,7 @@ import {
   toggleAll,
   toggleStudent,
 } from "../keyboards";
+import { normalizePrivateKey, unwrapEnvValue } from "../sheets";
 import type {
   AttendanceSession,
   Student,
@@ -93,4 +94,12 @@ test("attendance rows include present and absent statuses", () => {
   assert.equal(rows[1][7], "Відсутній");
   assert.equal(rows[0][8], "123");
   assert.equal(rows[0][10], "2026-07-18T12:00:00.000Z");
+});
+
+test("Vercel environment values accept wrapping quotes and escaped newlines", () => {
+  assert.equal(unwrapEnvValue('"service@example.com"'), "service@example.com");
+  assert.equal(
+    normalizePrivateKey('"-----BEGIN PRIVATE KEY-----\\nabc\\n-----END PRIVATE KEY-----\\n"'),
+    "-----BEGIN PRIVATE KEY-----\nabc\n-----END PRIVATE KEY-----\n"
+  );
 });

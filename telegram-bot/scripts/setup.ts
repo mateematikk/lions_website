@@ -1,5 +1,4 @@
 import { loadEnvConfig } from "@next/env";
-import { initializeWorkbook } from "../sheets";
 import { setWebhook } from "../telegram";
 import { requireEnv } from "../config";
 
@@ -17,13 +16,12 @@ async function main() {
   const webhookUrl = `${baseUrl}/api/telegram/webhook`;
   const secret = requireEnv("TELEGRAM_WEBHOOK_SECRET");
 
-  console.log("Перевіряю структуру Google Sheets...");
-  await initializeWorkbook();
-
   console.log(`Реєструю webhook: ${webhookUrl}`);
   await setWebhook(webhookUrl, secret);
 
-  console.log("Готово. Відкрийте бота в Telegram і надішліть /start.");
+  console.log(
+    "Готово. Відкрийте бота в Telegram і надішліть /start — таблиця ініціалізується через змінні Vercel."
+  );
 }
 
 main().catch((error) => {

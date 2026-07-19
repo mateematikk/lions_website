@@ -24,8 +24,8 @@ function getSheetsClient(): sheets_v4.Sheets {
   if (sheetsClient) return sheetsClient;
 
   const auth = new google.auth.JWT({
-    email: requireEnv("GOOGLE_SERVICE_ACCOUNT_EMAIL"),
-    key: requireEnv("GOOGLE_PRIVATE_KEY").replace(/\\n/g, "\n"),
+    email: unwrapEnvValue(requireEnv("GOOGLE_SERVICE_ACCOUNT_EMAIL")),
+    key: normalizePrivateKey(requireEnv("GOOGLE_PRIVATE_KEY")),
     scopes: [SHEETS_SCOPE],
   });
   sheetsClient = google.sheets({ version: "v4", auth });
@@ -33,7 +33,21 @@ function getSheetsClient(): sheets_v4.Sheets {
 }
 
 function spreadsheetId(): string {
-  return requireEnv("GOOGLE_SHEET_ID");
+  const value = unwrapEnvValue(requireEnv("GOOGLE_SHEET_ID"));
+  const match = value.match(/\/spreadsheets\/d\/([^/]+)/);
+  return match?.[1] ?? value;
+}
+
+export function unwrapEnvValue(value: string): string {
+  const trimmed = value.trim();
+  const hasMatchingQuotes =
+    (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+    (trimmed.startsWith("'") && trimmed.endsWith("'"));
+  return hasMatchingQuotes ? trimmed.slice(1, -1) : trimmed;
+}
+
+export function normalizePrivateKey(value: string): string {
+  return unwrapEnvValue(value).replace(/\\n/g, "\n");
 }
 
 function quoteSheet(name: string): string {
