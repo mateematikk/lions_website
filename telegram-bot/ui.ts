@@ -36,7 +36,7 @@ export function formatFlowHeader(options: {
   title: string;
   step?: number;
   steps?: number;
-  crumbs: string[];
+  crumbs?: string[];
   address?: string;
   hint?: string;
 }): string {
@@ -44,7 +44,7 @@ export function formatFlowHeader(options: {
   if (options.step && options.steps) {
     lines.push(`Крок ${options.step}/${options.steps}`);
   }
-  if (options.crumbs.length) {
+  if (options.crumbs?.length) {
     lines.push(escapeHtml(options.crumbs.join(" → ")));
   }
   if (options.address) {
