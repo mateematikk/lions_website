@@ -10,6 +10,16 @@ export type BotAction =
   | { type: "student"; studentId: string; present: boolean }
   | { type: "all"; present: boolean }
   | { type: "finish"; session: AttendanceSession }
+  | { type: "stats-location"; locationId: string }
+  | { type: "stats-group"; locationId: string; groupId: string }
+  | { type: "stats-all"; locationId: string; groupId: string; page: number }
+  | { type: "stats-pick"; locationId: string; groupId: string; page: number }
+  | {
+      type: "stats-student";
+      locationId: string;
+      groupId: string;
+      studentId: string;
+    }
   | { type: "cancel" }
   | { type: "unknown" };
 
@@ -77,6 +87,26 @@ export const callbackData = {
         compactTime(session.time),
       ].join(SEPARATOR)
     ),
+  statsLocation: (locationId: string) =>
+    assertTelegramLimit(["SL", safePart(locationId)].join(SEPARATOR)),
+  statsGroup: (locationId: string, groupId: string) =>
+    assertTelegramLimit(["SG", safePart(locationId), safePart(groupId)].join(SEPARATOR)),
+  statsAll: (locationId: string, groupId: string, page: number) =>
+    assertTelegramLimit(
+      ["SA", safePart(locationId), safePart(groupId), String(Math.max(0, page))].join(
+        SEPARATOR
+      )
+    ),
+  statsPick: (locationId: string, groupId: string, page: number) =>
+    assertTelegramLimit(
+      ["SP", safePart(locationId), safePart(groupId), String(Math.max(0, page))].join(
+        SEPARATOR
+      )
+    ),
+  statsStudent: (locationId: string, groupId: string, studentId: string) =>
+    assertTelegramLimit(
+      ["SS", safePart(locationId), safePart(groupId), safePart(studentId)].join(SEPARATOR)
+    ),
   cancel: () => "C",
 };
 
@@ -113,6 +143,32 @@ export function parseCallbackData(data: string): BotAction {
   }
   if (action === "A" && parts.length === 2) {
     return { type: "all", present: parts[1] === "1" };
+  }
+  if (action === "SL" && parts.length === 2) {
+    return { type: "stats-location", locationId: parts[1] };
+  }
+  if (action === "SG" && parts.length === 3) {
+    return { type: "stats-group", locationId: parts[1], groupId: parts[2] };
+  }
+  if (action === "SA" && parts.length === 4) {
+    const page = Number(parts[3]);
+    return Number.isInteger(page) && page >= 0
+      ? { type: "stats-all", locationId: parts[1], groupId: parts[2], page }
+      : { type: "unknown" };
+  }
+  if (action === "SP" && parts.length === 4) {
+    const page = Number(parts[3]);
+    return Number.isInteger(page) && page >= 0
+      ? { type: "stats-pick", locationId: parts[1], groupId: parts[2], page }
+      : { type: "unknown" };
+  }
+  if (action === "SS" && parts.length === 4) {
+    return {
+      type: "stats-student",
+      locationId: parts[1],
+      groupId: parts[2],
+      studentId: parts[3],
+    };
   }
   if (action === "C") return { type: "cancel" };
 

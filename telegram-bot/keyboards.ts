@@ -1,5 +1,6 @@
 import { callbackData, parseCallbackData } from "./callback";
 import { LOCATION_LABELS } from "./config";
+import { STATS_PAGE_SIZE } from "./stats";
 import type {
   AttendanceMark,
   AttendanceSession,
@@ -8,6 +9,10 @@ import type {
   Trainer,
   TrainingGroup,
 } from "./types";
+
+function cancelRow(): InlineKeyboardMarkup["inline_keyboard"][number] {
+  return [{ text: "Скасувати", callback_data: callbackData.cancel() }];
+}
 
 export function locationsKeyboard(trainer: Trainer): InlineKeyboardMarkup {
   const locationIds = trainer.locationIds.includes("*")
@@ -23,7 +28,27 @@ export function locationsKeyboard(trainer: Trainer): InlineKeyboardMarkup {
             callback_data: callbackData.location(id),
           },
         ]),
-      [{ text: "Скасувати", callback_data: callbackData.cancel() }],
+      cancelRow(),
+    ],
+  };
+}
+
+/** Location picker for the /stats flow. */
+export function statsLocationsKeyboard(trainer: Trainer): InlineKeyboardMarkup {
+  const locationIds = trainer.locationIds.includes("*")
+    ? Object.keys(LOCATION_LABELS)
+    : trainer.locationIds;
+  return {
+    inline_keyboard: [
+      ...locationIds
+        .filter((id) => LOCATION_LABELS[id])
+        .map((id) => [
+          {
+            text: LOCATION_LABELS[id],
+            callback_data: callbackData.statsLocation(id),
+          },
+        ]),
+      cancelRow(),
     ],
   };
 }
@@ -40,7 +65,146 @@ export function groupsKeyboard(
           callback_data: callbackData.group(locationId, group.id),
         },
       ]),
-      [{ text: "Скасувати", callback_data: callbackData.cancel() }],
+      cancelRow(),
+    ],
+  };
+}
+
+/** Group picker for the /stats flow. */
+export function statsGroupsKeyboard(
+  locationId: string,
+  groups: TrainingGroup[]
+): InlineKeyboardMarkup {
+  return {
+    inline_keyboard: [
+      ...groups.map((group) => [
+        {
+          text: group.name,
+          callback_data: callbackData.statsGroup(locationId, group.id),
+        },
+      ]),
+      cancelRow(),
+    ],
+  };
+}
+
+/** Actions under a group statistics report. */
+export function statsGroupActionsKeyboard(
+  locationId: string,
+  groupId: string,
+  options?: { showAll?: boolean; page?: number; total?: number }
+): InlineKeyboardMarkup {
+  const showAll = options?.showAll ?? false;
+  const page = options?.page ?? 0;
+  const total = options?.total ?? 0;
+  const totalPages = Math.max(1, Math.ceil(total / STATS_PAGE_SIZE));
+  const rows: InlineKeyboardMarkup["inline_keyboard"] = [];
+
+  if (showAll) {
+    const nav: InlineKeyboardMarkup["inline_keyboard"][number] = [];
+    if (page > 0) {
+      nav.push({
+        text: "← Назад",
+        callback_data: callbackData.statsAll(locationId, groupId, page - 1),
+      });
+    }
+    if (page + 1 < totalPages) {
+      nav.push({
+        text: "Далі →",
+        callback_data: callbackData.statsAll(locationId, groupId, page + 1),
+      });
+    }
+    if (nav.length) rows.push(nav);
+    rows.push([
+      {
+        text: "Топ пропусків",
+        callback_data: callbackData.statsGroup(locationId, groupId),
+      },
+    ]);
+  } else {
+    rows.push([
+      {
+        text: "Показати всіх",
+        callback_data: callbackData.statsAll(locationId, groupId, 0),
+      },
+    ]);
+  }
+
+  rows.push([
+    {
+      text: "Знайти учня",
+      callback_data: callbackData.statsPick(locationId, groupId, 0),
+    },
+  ]);
+  rows.push([
+    {
+      text: "Інша група",
+      callback_data: callbackData.statsLocation(locationId),
+    },
+  ]);
+  rows.push(cancelRow());
+  return { inline_keyboard: rows };
+}
+
+/** Paginated student picker for stats. */
+export function statsStudentsKeyboard(
+  locationId: string,
+  groupId: string,
+  students: Student[],
+  page: number
+): InlineKeyboardMarkup {
+  const totalPages = Math.max(1, Math.ceil(students.length / STATS_PAGE_SIZE));
+  const safePage = Math.min(Math.max(page, 0), totalPages - 1);
+  const slice = students.slice(
+    safePage * STATS_PAGE_SIZE,
+    safePage * STATS_PAGE_SIZE + STATS_PAGE_SIZE
+  );
+  const rows: InlineKeyboardMarkup["inline_keyboard"] = slice.map((student) => [
+    {
+      text: student.name,
+      callback_data: callbackData.statsStudent(locationId, groupId, student.id),
+    },
+  ]);
+
+  const nav: InlineKeyboardMarkup["inline_keyboard"][number] = [];
+  if (safePage > 0) {
+    nav.push({
+      text: "← Назад",
+      callback_data: callbackData.statsPick(locationId, groupId, safePage - 1),
+    });
+  }
+  if (safePage + 1 < totalPages) {
+    nav.push({
+      text: "Далі →",
+      callback_data: callbackData.statsPick(locationId, groupId, safePage + 1),
+    });
+  }
+  if (nav.length) rows.push(nav);
+
+  rows.push([
+    {
+      text: "До звіту групи",
+      callback_data: callbackData.statsGroup(locationId, groupId),
+    },
+  ]);
+  rows.push(cancelRow());
+  return { inline_keyboard: rows };
+}
+
+/** Navigation under a single-student stats report. */
+export function statsStudentActionsKeyboard(
+  locationId: string,
+  groupId: string
+): InlineKeyboardMarkup {
+  return {
+    inline_keyboard: [
+      [
+        {
+          text: "Назад до групи",
+          callback_data: callbackData.statsGroup(locationId, groupId),
+        },
+      ],
+      cancelRow(),
     ],
   };
 }
@@ -61,7 +225,7 @@ export function datesKeyboard(locationId: string, groupId: string): InlineKeyboa
           callback_data: callbackData.date(locationId, groupId, toIsoDate(date)),
         },
       ]),
-      [{ text: "Скасувати", callback_data: callbackData.cancel() }],
+      cancelRow(),
     ],
   };
 }
@@ -86,7 +250,7 @@ export function timesKeyboard(
           callback_data: callbackData.time({ locationId, groupId, date, time }),
         },
       ]),
-      [{ text: "Скасувати", callback_data: callbackData.cancel() }],
+      cancelRow(),
     ],
   };
 }
@@ -113,7 +277,7 @@ export function attendanceKeyboard(
           callback_data: callbackData.finish(session),
         },
       ],
-      [{ text: "Скасувати", callback_data: callbackData.cancel() }],
+      cancelRow(),
     ],
   };
 }

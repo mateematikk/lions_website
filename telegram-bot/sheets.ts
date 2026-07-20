@@ -7,10 +7,12 @@ import {
   SHEET_HEADERS,
   SHEET_NAMES,
 } from "./config";
+import { rowToStudentStat } from "./stats";
 import type {
   AttendanceMark,
   AttendanceSession,
   Student,
+  StudentStat,
   Trainer,
   TrainingGroup,
 } from "./types";
@@ -208,6 +210,31 @@ export async function getStudentsForGroup(groupId: string): Promise<Student[]> {
     }))
     .filter((student) => student.active && student.groupId === groupId && student.id && student.name)
     .sort((a, b) => a.name.localeCompare(b.name, "uk"));
+}
+
+/**
+ * Reads aggregated statistics for every student in a group.
+ */
+export async function getStatisticsForGroup(groupId: string): Promise<StudentStat[]> {
+  const rows = await readRows(SHEET_NAMES.statistics, "A2:H");
+  return rows
+    .map(rowToStudentStat)
+    .filter((item): item is StudentStat => item !== null && item.groupId === groupId)
+    .sort((a, b) => a.name.localeCompare(b.name, "uk"));
+}
+
+/**
+ * Reads aggregated statistics for one student.
+ */
+export async function getStatisticsForStudent(
+  studentId: string
+): Promise<StudentStat | null> {
+  const rows = await readRows(SHEET_NAMES.statistics, "A2:H");
+  for (const row of rows) {
+    const item = rowToStudentStat(row);
+    if (item?.studentId === studentId) return item;
+  }
+  return null;
 }
 
 export async function saveAttendance(

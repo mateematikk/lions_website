@@ -10,9 +10,17 @@ import {
   toggleStudent,
 } from "../keyboards";
 import { normalizePrivateKey, unwrapEnvValue } from "../sheets";
+import {
+  averageAttendanceRate,
+  formatGroupStatsText,
+  formatStudentStatsText,
+  lowestAttendance,
+  rowToStudentStat,
+} from "../stats";
 import type {
   AttendanceSession,
   Student,
+  StudentStat,
   Trainer,
 } from "../types";
 
@@ -40,9 +48,37 @@ test("callback data round-trips attendance session", () => {
   assert.deepEqual(action, { type: "finish", session });
 });
 
+test("stats callback data round-trips", () => {
+  assert.deepEqual(parseCallbackData(callbackData.statsLocation("pozniaky")), {
+    type: "stats-location",
+    locationId: "pozniaky",
+  });
+  assert.deepEqual(parseCallbackData(callbackData.statsGroup("pozniaky", "poz-kids")), {
+    type: "stats-group",
+    locationId: "pozniaky",
+    groupId: "poz-kids",
+  });
+  assert.deepEqual(parseCallbackData(callbackData.statsAll("pozniaky", "poz-kids", 2)), {
+    type: "stats-all",
+    locationId: "pozniaky",
+    groupId: "poz-kids",
+    page: 2,
+  });
+  assert.deepEqual(
+    parseCallbackData(callbackData.statsStudent("pozniaky", "poz-kids", "s-1")),
+    {
+      type: "stats-student",
+      locationId: "pozniaky",
+      groupId: "poz-kids",
+      studentId: "s-1",
+    }
+  );
+});
+
 test("callback parser rejects malformed data", () => {
   assert.deepEqual(parseCallbackData("D|only|two"), { type: "unknown" });
   assert.deepEqual(parseCallbackData("nope"), { type: "unknown" });
+  assert.deepEqual(parseCallbackData("SA|pozniaky|poz-kids|-1"), { type: "unknown" });
 });
 
 test("session id is deterministic", () => {
@@ -101,5 +137,72 @@ test("Vercel environment values accept wrapping quotes and escaped newlines", ()
   assert.equal(
     normalizePrivateKey('"-----BEGIN PRIVATE KEY-----\\nabc\\n-----END PRIVATE KEY-----\\n"'),
     "-----BEGIN PRIVATE KEY-----\nabc\n-----END PRIVATE KEY-----\n"
+  );
+});
+
+const sampleStats: StudentStat[] = [
+  {
+    studentId: "s-1",
+    name: "Іван",
+    groupId: "poz-kids",
+    present: 2,
+    absent: 8,
+    total: 10,
+    rate: 20,
+    lastDate: "2026-07-10",
+  },
+  {
+    studentId: "s-2",
+    name: "Олена",
+    groupId: "poz-kids",
+    present: 9,
+    absent: 1,
+    total: 10,
+    rate: 90,
+    lastDate: "2026-07-18",
+  },
+  {
+    studentId: "s-3",
+    name: "Марія",
+    groupId: "poz-kids",
+    present: 4,
+    absent: 6,
+    total: 10,
+    rate: 40,
+    lastDate: "2026-07-12",
+  },
+];
+
+test("stats helpers sort lowest attendance and average rate", () => {
+  assert.deepEqual(
+    lowestAttendance(sampleStats, 2).map((item) => item.studentId),
+    ["s-1", "s-3"]
+  );
+  assert.equal(averageAttendanceRate(sampleStats), 50);
+});
+
+test("stats row parser and text formatters", () => {
+  const parsed = rowToStudentStat([
+    "s-9",
+    "Петро",
+    "poz-kids",
+    "3",
+    "1",
+    "4",
+    "75",
+    "2026-07-19",
+  ]);
+  assert.equal(parsed?.rate, 75);
+  assert.match(
+    formatGroupStatsText("Діти", "Позняки", sampleStats),
+    /Середня відвідуваність: <b>50%<\/b>/
+  );
+  assert.match(
+    formatStudentStatsText(parsed, "Діти"),
+    /Відвідуваність: <b>75%<\/b>/
+  );
+  assert.match(
+    formatStudentStatsText(null, "Діти", "Новий учень"),
+    /Немає даних/
   );
 });

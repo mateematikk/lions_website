@@ -8,6 +8,11 @@ import {
   datesKeyboard,
   groupsKeyboard,
   locationsKeyboard,
+  statsGroupActionsKeyboard,
+  statsGroupsKeyboard,
+  statsLocationsKeyboard,
+  statsStudentActionsKeyboard,
+  statsStudentsKeyboard,
   timesKeyboard,
   toggleAll,
   toggleStudent,
@@ -16,11 +21,17 @@ import {
   getGroup,
   getGroupsForLocation,
   getSessionTimes,
+  getStatisticsForGroup,
+  getStatisticsForStudent,
   getStudentsForGroup,
   getTrainer,
   initializeWorkbook,
   saveAttendance,
 } from "./sheets";
+import {
+  formatGroupStatsText,
+  formatStudentStatsText,
+} from "./stats";
 import {
   answerCallbackQuery,
   editMessageReplyMarkup,
@@ -48,45 +59,63 @@ async function handleMessage(message: TelegramMessage): Promise<void> {
   if (!message.from || !message.text) return;
 
   if (message.chat.type !== "private") {
-    if (message.text.startsWith("/start")) {
+    if (
+      message.text.startsWith("/start") ||
+      message.text.startsWith("/stats") ||
+      message.text.startsWith("/attendance")
+    ) {
       await sendMessage(
         message.chat.id,
-        "Облік відвідуваності доступний лише в особистому чаті з ботом."
+        "Облік і статистика доступні лише в особистому чаті з ботом."
       );
     }
     return;
   }
 
-  if (message.text.startsWith("/start") || message.text.startsWith("/attendance")) {
-    await initializeWorkbook();
-    const trainer = await getTrainer(message.from.id);
-    if (!trainer?.active) {
-      await sendMessage(
-        message.chat.id,
-        [
-          "<b>Доступ не налаштовано.</b>",
-          "",
-          "Передайте адміністратору ваш Telegram ID:",
-          `<code>${message.from.id}</code>`,
-        ].join("\n")
-      );
-      return;
-    }
+  const isAttendance =
+    message.text.startsWith("/start") || message.text.startsWith("/attendance");
+  const isStats = message.text.startsWith("/stats");
+  if (!isAttendance && !isStats) return;
 
-    if (!trainer.locationIds.length) {
-      await sendMessage(
-        message.chat.id,
-        "Для вашого профілю не вказано жодної локації. Зверніться до адміністратора."
-      );
-      return;
-    }
-
+  await initializeWorkbook();
+  const trainer = await getTrainer(message.from.id);
+  if (!trainer?.active) {
     await sendMessage(
       message.chat.id,
-      `<b>Облік відвідуваності</b>\n\nВітаю, ${escapeHtml(trainer.name)}. Оберіть локацію:`,
-      locationsKeyboard(trainer)
+      [
+        "<b>Доступ не налаштовано.</b>",
+        "",
+        "Передайте адміністратору ваш Telegram ID:",
+        `<code>${message.from.id}</code>`,
+      ].join("\n")
     );
+    return;
   }
+
+  if (!trainer.locationIds.length) {
+    await sendMessage(
+      message.chat.id,
+      "Для вашого профілю не вказано жодної локації. Зверніться до адміністратора."
+    );
+    return;
+  }
+
+  if (isStats) {
+    await sendMessage(
+      message.chat.id,
+      `<b>Статистика відвідуваності</b>\n\nВітаю, ${escapeHtml(
+        trainer.name
+      )}. Оберіть локацію:`,
+      statsLocationsKeyboard(trainer)
+    );
+    return;
+  }
+
+  await sendMessage(
+    message.chat.id,
+    `<b>Облік відвідуваності</b>\n\nВітаю, ${escapeHtml(trainer.name)}. Оберіть локацію:`,
+    locationsKeyboard(trainer)
+  );
 }
 
 async function handleCallback(query: CallbackQuery): Promise<void> {
@@ -109,7 +138,7 @@ async function handleCallback(query: CallbackQuery): Promise<void> {
       await editMessageText(
         message.chat.id,
         message.message_id,
-        "Дію скасовано. Надішліть /start, щоб почати знову."
+        "Дію скасовано. Надішліть /start або /stats, щоб почати знову."
       );
       return;
     }
@@ -250,8 +279,124 @@ async function handleCallback(query: CallbackQuery): Promise<void> {
           `Присутні: <b>${result.present}</b>`,
           `Відсутні: <b>${result.absent}</b>`,
           "",
-          "Надішліть /start для нового заняття.",
+          "Надішліть /start для нового заняття або /stats для статистики.",
         ].join("\n")
+      );
+      return;
+    }
+
+    if (action.type === "stats-location") {
+      assertLocationAccess(trainer, action.locationId);
+      const groups = await getGroupsForLocation(action.locationId);
+      await answerCallbackQuery(query.id);
+      await editMessageText(
+        message.chat.id,
+        message.message_id,
+        groups.length
+          ? `<b>Статистика</b>\n${escapeHtml(
+              locationLabel(action.locationId)
+            )}\n\nОберіть групу:`
+          : `Для локації <b>${escapeHtml(
+              locationLabel(action.locationId)
+            )}</b> ще не додано груп.`,
+        groups.length ? statsGroupsKeyboard(action.locationId, groups) : undefined
+      );
+      return;
+    }
+
+    if (action.type === "stats-group") {
+      await assertGroupAccess(trainer, action.locationId, action.groupId);
+      const [group, stats] = await Promise.all([
+        getGroup(action.groupId),
+        getStatisticsForGroup(action.groupId),
+      ]);
+      await answerCallbackQuery(query.id);
+      await editMessageText(
+        message.chat.id,
+        message.message_id,
+        formatGroupStatsText(
+          group?.name ?? action.groupId,
+          locationLabel(action.locationId),
+          stats
+        ),
+        statsGroupActionsKeyboard(action.locationId, action.groupId, {
+          total: stats.length,
+        })
+      );
+      return;
+    }
+
+    if (action.type === "stats-all") {
+      await assertGroupAccess(trainer, action.locationId, action.groupId);
+      const [group, stats] = await Promise.all([
+        getGroup(action.groupId),
+        getStatisticsForGroup(action.groupId),
+      ]);
+      await answerCallbackQuery(query.id);
+      await editMessageText(
+        message.chat.id,
+        message.message_id,
+        formatGroupStatsText(
+          group?.name ?? action.groupId,
+          locationLabel(action.locationId),
+          stats,
+          { showAll: true, page: action.page }
+        ),
+        statsGroupActionsKeyboard(action.locationId, action.groupId, {
+          showAll: true,
+          page: action.page,
+          total: stats.length,
+        })
+      );
+      return;
+    }
+
+    if (action.type === "stats-pick") {
+      await assertGroupAccess(trainer, action.locationId, action.groupId);
+      const [group, students] = await Promise.all([
+        getGroup(action.groupId),
+        getStudentsForGroup(action.groupId),
+      ]);
+      if (!students.length) {
+        await answerCallbackQuery(query.id, "У цій групі ще немає учнів", true);
+        return;
+      }
+      await answerCallbackQuery(query.id);
+      await editMessageText(
+        message.chat.id,
+        message.message_id,
+        `<b>${escapeHtml(group?.name ?? action.groupId)}</b>\n\nОберіть учня:`,
+        statsStudentsKeyboard(action.locationId, action.groupId, students, action.page)
+      );
+      return;
+    }
+
+    if (action.type === "stats-student") {
+      await assertGroupAccess(trainer, action.locationId, action.groupId);
+      const [group, students, stat] = await Promise.all([
+        getGroup(action.groupId),
+        getStudentsForGroup(action.groupId),
+        getStatisticsForStudent(action.studentId),
+      ]);
+      const student = students.find((item) => item.id === action.studentId);
+      if (stat && stat.groupId !== action.groupId) {
+        await answerCallbackQuery(query.id, "Учень не з цієї групи", true);
+        return;
+      }
+      if (!student && !stat) {
+        await answerCallbackQuery(query.id, "Учня не знайдено", true);
+        return;
+      }
+      await answerCallbackQuery(query.id);
+      await editMessageText(
+        message.chat.id,
+        message.message_id,
+        formatStudentStatsText(
+          stat,
+          group?.name ?? action.groupId,
+          student?.name ?? stat?.name
+        ),
+        statsStudentActionsKeyboard(action.locationId, action.groupId)
       );
       return;
     }
@@ -266,7 +411,7 @@ async function handleCallback(query: CallbackQuery): Promise<void> {
     ).catch(() => undefined);
     await sendMessage(
       message.chat.id,
-      "Не вдалося виконати дію. Спробуйте /start ще раз або зверніться до адміністратора."
+      "Не вдалося виконати дію. Спробуйте /start або /stats ще раз або зверніться до адміністратора."
     ).catch(() => undefined);
   }
 }

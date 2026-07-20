@@ -72,3 +72,15 @@ export interface AttendanceMark {
   studentId: string;
   present: boolean;
 }
+
+/** Aggregated attendance row from the Статистика sheet. */
+export interface StudentStat {
+  studentId: string;
+  name: string;
+  groupId: string;
+  present: number;
+  absent: number;
+  total: number;
+  rate: number;
+  lastDate: string;
+}
