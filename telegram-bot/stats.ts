@@ -1,4 +1,9 @@
 import type { StudentStat } from "./types";
+import {
+  escapeHtml,
+  formatStatLineWithMarker,
+  formatUiDate,
+} from "./ui";
 
 const LOW_ATTENDANCE_TOP = 5;
 export const STATS_PAGE_SIZE = 12;
@@ -82,23 +87,14 @@ export function averageAttendanceRate(stats: StudentStat[]): number | null {
  */
 export function formatStatDate(date: string): string {
   if (!date) return "—";
-  if (/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-    return new Intl.DateTimeFormat("uk-UA", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    }).format(new Date(`${date}T12:00:00`));
-  }
-  return date;
+  return formatUiDate(date);
 }
 
 /**
  * Formats a compact one-line student stats summary.
  */
 export function formatStatLine(stat: StudentStat, index?: number): string {
-  const prefix = index === undefined ? "•" : `${index}.`;
-  const last = formatStatDate(stat.lastDate);
-  return `${prefix} ${stat.name} — ${stat.rate}% (${stat.present}/${stat.total}), останнє: ${last}`;
+  return formatStatLineWithMarker(stat, index);
 }
 
 /**
@@ -108,21 +104,21 @@ export function formatGroupStatsText(
   groupName: string,
   locationLabel: string,
   stats: StudentStat[],
-  options?: { showAll?: boolean; page?: number }
+  options?: { showAll?: boolean; page?: number; crumbs?: string }
 ): string {
   const showAll = options?.showAll ?? false;
   const page = options?.page ?? 0;
   const average = averageAttendanceRate(stats);
   const header = [
     `<b>📊 ${escapeHtml(groupName)}</b>`,
-    escapeHtml(locationLabel),
+    options?.crumbs ? escapeHtml(options.crumbs) : escapeHtml(locationLabel),
     "",
   ];
 
   if (!stats.length) {
     return [
       ...header,
-      "Немає даних. Збережіть хоча б одне заняття через /start.",
+      "Немає даних. Збережіть хоча б одне заняття через меню.",
     ].join("\n");
   }
 
@@ -168,7 +164,7 @@ export function formatStudentStatsText(
       `<b>👤 ${escapeHtml(name)}</b>`,
       `Група: ${escapeHtml(groupName)}`,
       "",
-      "Немає даних. Збережіть хоча б одне заняття через /start.",
+      "Немає даних. Збережіть хоча б одне заняття через меню.",
     ].join("\n");
   }
 
@@ -182,11 +178,4 @@ export function formatStudentStatsText(
     `Відвідуваність: <b>${stat.rate}%</b>`,
     `Останнє заняття: <b>${escapeHtml(formatStatDate(stat.lastDate))}</b>`,
   ].join("\n");
-}
-
-function escapeHtml(value: string): string {
-  return value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;");
 }

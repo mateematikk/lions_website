@@ -42,6 +42,14 @@ export const LOCATION_LABELS: Record<string, string> = {
   pochaina: "Почайна — вул. Йорданська, 4г",
 };
 
+/** Compact labels for inline keyboard buttons. */
+export const LOCATION_SHORT_LABELS: Record<string, string> = {
+  pozniaky: "📍 Мишуги",
+  "kniazhyi-zaton": "📍 Княжий",
+  darnytsia: "📍 Дарниця",
+  pochaina: "📍 Почайна",
+};
+
 export function requireEnv(name: string): string {
   const value = process.env[name]?.trim();
   if (!value) {

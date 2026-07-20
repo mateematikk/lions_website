@@ -73,6 +73,15 @@ test("stats callback data round-trips", () => {
       studentId: "s-1",
     }
   );
+  assert.deepEqual(parseCallbackData(callbackData.menuAttendance()), {
+    type: "menu-attendance",
+  });
+  assert.deepEqual(parseCallbackData(callbackData.menuStats()), {
+    type: "menu-stats",
+  });
+  assert.deepEqual(parseCallbackData(callbackData.menuHome()), {
+    type: "menu-home",
+  });
 });
 
 test("callback parser rejects malformed data", () => {
@@ -198,6 +207,10 @@ test("stats row parser and text formatters", () => {
     /Середня відвідуваність: <b>50%<\/b>/
   );
   assert.match(
+    formatGroupStatsText("Діти", "Позняки", sampleStats),
+    /🔴 Іван/
+  );
+  assert.match(
     formatStudentStatsText(parsed, "Діти"),
     /Відвідуваність: <b>75%<\/b>/
   );
@@ -205,4 +218,13 @@ test("stats row parser and text formatters", () => {
     formatStudentStatsText(null, "Діти", "Новий учень"),
     /Немає даних/
   );
+});
+
+test("UI helpers shorten locations and decorate groups", async () => {
+  const { groupButtonLabel, locationShortLabel, rateMarker } = await import("../ui");
+  assert.equal(locationShortLabel("pozniaky"), "📍 Мишуги");
+  assert.equal(groupButtonLabel("Діти · MMA"), "🥊 Діти · MMA");
+  assert.equal(rateMarker(95), "🟢");
+  assert.equal(rateMarker(75), "🟡");
+  assert.equal(rateMarker(20), "🔴");
 });
