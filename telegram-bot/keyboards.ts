@@ -34,11 +34,14 @@ function chunkButtons(
   return rows;
 }
 
-function trainerLocationIds(trainer: Trainer): string[] {
+function trainerLocationIds(trainer: Trainer, allowedIds?: string[]): string[] {
   const ids = trainer.locationIds.includes("*")
     ? Object.keys(LOCATION_LABELS)
     : trainer.locationIds;
-  return ids.filter((id) => LOCATION_LABELS[id]);
+  const filtered = ids.filter((id) => LOCATION_LABELS[id]);
+  if (!allowedIds?.length) return filtered;
+  const allowed = new Set(allowedIds);
+  return filtered.filter((id) => allowed.has(id));
 }
 
 /** Main hub shown after /start. */
@@ -53,10 +56,13 @@ export function mainMenuKeyboard(): InlineKeyboardMarkup {
   };
 }
 
-export function locationsKeyboard(trainer: Trainer): InlineKeyboardMarkup {
+export function locationsKeyboard(
+  trainer: Trainer,
+  allowedLocationIds?: string[]
+): InlineKeyboardMarkup {
   return {
     inline_keyboard: [
-      ...trainerLocationIds(trainer).map((id) => [
+      ...trainerLocationIds(trainer, allowedLocationIds).map((id) => [
         {
           text: locationShortLabel(id),
           callback_data: callbackData.location(id),
@@ -69,10 +75,13 @@ export function locationsKeyboard(trainer: Trainer): InlineKeyboardMarkup {
 }
 
 /** Location picker for the /stats flow. */
-export function statsLocationsKeyboard(trainer: Trainer): InlineKeyboardMarkup {
+export function statsLocationsKeyboard(
+  trainer: Trainer,
+  allowedLocationIds?: string[]
+): InlineKeyboardMarkup {
   return {
     inline_keyboard: [
-      ...trainerLocationIds(trainer).map((id) => [
+      ...trainerLocationIds(trainer, allowedLocationIds).map((id) => [
         {
           text: locationShortLabel(id),
           callback_data: callbackData.statsLocation(id),

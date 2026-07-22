@@ -7,7 +7,7 @@ export const SHEET_NAMES = {
 } as const;
 
 export const SHEET_HEADERS: Record<(typeof SHEET_NAMES)[keyof typeof SHEET_NAMES], string[]> = {
-  [SHEET_NAMES.trainers]: ["telegram_id", "ім'я", "location_ids", "active"],
+  [SHEET_NAMES.trainers]: ["telegram_id", "ім'я", "location_ids", "active", "group_ids"],
   [SHEET_NAMES.groups]: ["group_id", "location_id", "назва", "день", "час", "active"],
   [SHEET_NAMES.students]: ["student_id", "ПІБ", "group_id", "active"],
   [SHEET_NAMES.attendance]: [

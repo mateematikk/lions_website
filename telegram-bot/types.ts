@@ -42,6 +42,8 @@ export interface Trainer {
   telegramId: string;
   name: string;
   locationIds: string[];
+  /** Optional allow-list of group_id values. Empty = all groups in location_ids. */
+  groupIds: string[];
   active: boolean;
 }
 

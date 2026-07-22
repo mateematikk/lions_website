@@ -22,7 +22,9 @@ import type {
   Student,
   StudentStat,
   Trainer,
+  TrainingGroup,
 } from "../types";
+import { canAccessGroup, filterGroupsForTrainer, locationsFromGroups } from "../access";
 
 const session: AttendanceSession = {
   locationId: "pozniaky",
@@ -35,6 +37,7 @@ const trainer: Trainer = {
   telegramId: "123",
   name: "Тренер",
   locationIds: ["pozniaky"],
+  groupIds: [],
   active: true,
 };
 
@@ -105,6 +108,40 @@ test("location access supports explicit locations and wildcard", () => {
     true
   );
   assert.equal(canAccessLocation({ ...trainer, active: false }, "pozniaky"), false);
+});
+
+test("group_ids restrict trainer groups and enable single-group shortcut", () => {
+  const groups: TrainingGroup[] = [
+    {
+      id: "poz-adults",
+      locationId: "pozniaky",
+      name: "Дорослі",
+      day: "Вівторок",
+      time: "20:00",
+      active: true,
+    },
+    {
+      id: "poz-kids",
+      locationId: "pozniaky",
+      name: "Діти",
+      day: "Вівторок",
+      time: "18:00",
+      active: true,
+    },
+  ];
+  const yura: Trainer = {
+    ...trainer,
+    name: "Юра",
+    groupIds: ["poz-adults"],
+  };
+  const accessible = filterGroupsForTrainer(yura, groups);
+  assert.deepEqual(
+    accessible.map((group) => group.id),
+    ["poz-adults"]
+  );
+  assert.deepEqual(locationsFromGroups(accessible), ["pozniaky"]);
+  assert.equal(canAccessGroup(yura, "pozniaky", "poz-kids"), false);
+  assert.equal(canAccessGroup(yura, "pozniaky", "poz-adults"), true);
 });
 
 test("attendance keyboard toggles one student and all students", () => {

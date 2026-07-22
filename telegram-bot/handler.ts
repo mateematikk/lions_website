@@ -1,4 +1,9 @@
-import { canAccessLocation } from "./access";
+import {
+  canAccessGroup,
+  canAccessLocation,
+  filterGroupsForTrainer,
+  locationsFromGroups,
+} from "./access";
 import { parseCallbackData } from "./callback";
 import {
   attendanceCount,
@@ -20,6 +25,7 @@ import {
   toggleStudent,
 } from "./keyboards";
 import {
+  getAccessibleGroups,
   getGroup,
   getGroupsForLocation,
   getSessionTimes,
@@ -41,9 +47,11 @@ import {
 } from "./telegram";
 import type {
   CallbackQuery,
+  InlineKeyboardMarkup,
   TelegramMessage,
   TelegramUpdate,
   Trainer,
+  TrainingGroup,
 } from "./types";
 import {
   escapeHtml,
@@ -54,6 +62,11 @@ import {
 } from "./ui";
 
 const ATTENDANCE_STEPS = 4;
+
+type MessageTarget = {
+  chatId: number;
+  messageId?: number;
+};
 
 export async function handleTelegramUpdate(update: TelegramUpdate): Promise<void> {
   if (update.message) {
@@ -111,29 +124,12 @@ async function handleMessage(message: TelegramMessage): Promise<void> {
   }
 
   if (isStats) {
-    await sendMessage(
-      message.chat.id,
-      formatFlowHeader({
-        title: "Статистика",
-        hint: `Вітаю, ${escapeHtml(trainer.name)}. Оберіть локацію:`,
-      }),
-      statsLocationsKeyboard(trainer)
-    );
+    await presentStatsStart({ chatId: message.chat.id }, trainer);
     return;
   }
 
   if (isAttendance) {
-    await sendMessage(
-      message.chat.id,
-      formatFlowHeader({
-        title: "Облік відвідуваності",
-        step: 1,
-        steps: ATTENDANCE_STEPS,
-        crumbs: [],
-        hint: "Оберіть локацію:",
-      }),
-      locationsKeyboard(trainer)
-    );
+    await presentAttendanceStart({ chatId: message.chat.id }, trainer);
     return;
   }
 
@@ -164,6 +160,10 @@ async function handleCallback(query: CallbackQuery): Promise<void> {
     }
 
     const action = parseCallbackData(query.data);
+    const target: MessageTarget = {
+      chatId: message.chat.id,
+      messageId: message.message_id,
+    };
 
     if (action.type === "cancel") {
       await answerCallbackQuery(query.id);
@@ -194,42 +194,29 @@ async function handleCallback(query: CallbackQuery): Promise<void> {
 
     if (action.type === "menu-attendance") {
       await answerCallbackQuery(query.id);
-      await editMessageText(
-        message.chat.id,
-        message.message_id,
-        formatFlowHeader({
-          title: "Облік відвідуваності",
-          step: 1,
-          steps: ATTENDANCE_STEPS,
-          crumbs: [],
-          hint: "Оберіть локацію:",
-        }),
-        locationsKeyboard(trainer)
-      );
+      await presentAttendanceStart(target, trainer);
       return;
     }
 
     if (action.type === "menu-stats") {
       await answerCallbackQuery(query.id);
-      await editMessageText(
-        message.chat.id,
-        message.message_id,
-        formatFlowHeader({
-          title: "Статистика",
-          hint: "Оберіть локацію:",
-        }),
-        statsLocationsKeyboard(trainer)
-      );
+      await presentStatsStart(target, trainer);
       return;
     }
 
     if (action.type === "location") {
       assertLocationAccess(trainer, action.locationId);
-      const groups = await getGroupsForLocation(action.locationId);
+      const groups = filterGroupsForTrainer(
+        trainer,
+        await getGroupsForLocation(action.locationId)
+      );
       await answerCallbackQuery(query.id);
-      await editMessageText(
-        message.chat.id,
-        message.message_id,
+      if (groups.length === 1) {
+        await presentDatePicker(target, groups[0]);
+        return;
+      }
+      await respond(
+        target,
         groups.length
           ? formatFlowHeader({
               title: "Облік відвідуваності",
@@ -241,7 +228,7 @@ async function handleCallback(query: CallbackQuery): Promise<void> {
             })
           : `Для локації <b>${escapeHtml(
               locationAddressLabel(action.locationId)
-            )}</b> ще не додано груп.`,
+            )}</b> ще не додано доступних груп.`,
         groups.length ? groupsKeyboard(action.locationId, groups) : mainMenuKeyboard()
       );
       return;
@@ -251,21 +238,11 @@ async function handleCallback(query: CallbackQuery): Promise<void> {
       await assertGroupAccess(trainer, action.locationId, action.groupId);
       const group = await getGroup(action.groupId);
       await answerCallbackQuery(query.id);
-      await editMessageText(
-        message.chat.id,
-        message.message_id,
-        formatFlowHeader({
-          title: "Облік відвідуваності",
-          step: 3,
-          steps: ATTENDANCE_STEPS,
-          crumbs: [
-            locationShortLabel(action.locationId),
-            group?.name ?? action.groupId,
-          ],
-          hint: "Оберіть дату заняття:",
-        }),
-        datesKeyboard(action.locationId, action.groupId)
-      );
+      if (!group) {
+        await respond(target, "Групу не знайдено.", mainMenuKeyboard());
+        return;
+      }
+      await presentDatePicker(target, group);
       return;
     }
 
@@ -403,11 +380,17 @@ async function handleCallback(query: CallbackQuery): Promise<void> {
 
     if (action.type === "stats-location") {
       assertLocationAccess(trainer, action.locationId);
-      const groups = await getGroupsForLocation(action.locationId);
+      const groups = filterGroupsForTrainer(
+        trainer,
+        await getGroupsForLocation(action.locationId)
+      );
       await answerCallbackQuery(query.id);
-      await editMessageText(
-        message.chat.id,
-        message.message_id,
+      if (groups.length === 1) {
+        await presentGroupStats(target, groups[0]);
+        return;
+      }
+      await respond(
+        target,
         groups.length
           ? formatFlowHeader({
               title: "Статистика",
@@ -417,7 +400,7 @@ async function handleCallback(query: CallbackQuery): Promise<void> {
             })
           : `Для локації <b>${escapeHtml(
               locationAddressLabel(action.locationId)
-            )}</b> ще не додано груп.`,
+            )}</b> ще не додано доступних груп.`,
         groups.length
           ? statsGroupsKeyboard(action.locationId, groups)
           : mainMenuKeyboard()
@@ -427,28 +410,13 @@ async function handleCallback(query: CallbackQuery): Promise<void> {
 
     if (action.type === "stats-group") {
       await assertGroupAccess(trainer, action.locationId, action.groupId);
-      const [group, stats] = await Promise.all([
-        getGroup(action.groupId),
-        getStatisticsForGroup(action.groupId),
-      ]);
-      const crumbs = [
-        locationShortLabel(action.locationId),
-        group?.name ?? action.groupId,
-      ].join(" → ");
+      const group = await getGroup(action.groupId);
       await answerCallbackQuery(query.id);
-      await editMessageText(
-        message.chat.id,
-        message.message_id,
-        formatGroupStatsText(
-          group?.name ?? action.groupId,
-          locationAddressLabel(action.locationId),
-          stats,
-          { crumbs }
-        ),
-        statsGroupActionsKeyboard(action.locationId, action.groupId, {
-          total: stats.length,
-        })
-      );
+      if (!group) {
+        await respond(target, "Групу не знайдено.", mainMenuKeyboard());
+        return;
+      }
+      await presentGroupStats(target, group);
       return;
     }
 
@@ -553,6 +521,144 @@ async function handleCallback(query: CallbackQuery): Promise<void> {
   }
 }
 
+async function presentAttendanceStart(
+  target: MessageTarget,
+  trainer: Trainer
+): Promise<void> {
+  const groups = await getAccessibleGroups(trainer);
+  if (!groups.length) {
+    await respond(
+      target,
+      "Немає доступних груп для вашого профілю. Зверніться до адміністратора.",
+      mainMenuKeyboard()
+    );
+    return;
+  }
+
+  if (groups.length === 1) {
+    await presentDatePicker(target, groups[0]);
+    return;
+  }
+
+  const locationIds = locationsFromGroups(groups);
+  if (locationIds.length === 1) {
+    const locationId = locationIds[0];
+    const locationGroups = groups.filter((group) => group.locationId === locationId);
+    await respond(
+      target,
+      formatFlowHeader({
+        title: "Облік відвідуваності",
+        step: 2,
+        steps: ATTENDANCE_STEPS,
+        crumbs: [locationShortLabel(locationId)],
+        address: locationAddressLabel(locationId),
+        hint: "Оберіть групу:",
+      }),
+      groupsKeyboard(locationId, locationGroups)
+    );
+    return;
+  }
+
+  await respond(
+    target,
+    formatFlowHeader({
+      title: "Облік відвідуваності",
+      step: 1,
+      steps: ATTENDANCE_STEPS,
+      hint: "Оберіть локацію:",
+    }),
+    locationsKeyboard(trainer, locationIds)
+  );
+}
+
+async function presentStatsStart(target: MessageTarget, trainer: Trainer): Promise<void> {
+  const groups = await getAccessibleGroups(trainer);
+  if (!groups.length) {
+    await respond(
+      target,
+      "Немає доступних груп для вашого профілю. Зверніться до адміністратора.",
+      mainMenuKeyboard()
+    );
+    return;
+  }
+
+  if (groups.length === 1) {
+    await presentGroupStats(target, groups[0]);
+    return;
+  }
+
+  const locationIds = locationsFromGroups(groups);
+  if (locationIds.length === 1) {
+    const locationId = locationIds[0];
+    const locationGroups = groups.filter((group) => group.locationId === locationId);
+    await respond(
+      target,
+      formatFlowHeader({
+        title: "Статистика",
+        crumbs: [locationShortLabel(locationId)],
+        address: locationAddressLabel(locationId),
+        hint: "Оберіть групу:",
+      }),
+      statsGroupsKeyboard(locationId, locationGroups)
+    );
+    return;
+  }
+
+  await respond(
+    target,
+    formatFlowHeader({
+      title: "Статистика",
+      hint: "Оберіть локацію:",
+    }),
+    statsLocationsKeyboard(trainer, locationIds)
+  );
+}
+
+async function presentDatePicker(
+  target: MessageTarget,
+  group: TrainingGroup
+): Promise<void> {
+  await respond(
+    target,
+    formatFlowHeader({
+      title: "Облік відвідуваності",
+      step: 3,
+      steps: ATTENDANCE_STEPS,
+      crumbs: [locationShortLabel(group.locationId), group.name],
+      address: locationAddressLabel(group.locationId),
+      hint: "Оберіть дату заняття:",
+    }),
+    datesKeyboard(group.locationId, group.id)
+  );
+}
+
+async function presentGroupStats(
+  target: MessageTarget,
+  group: TrainingGroup
+): Promise<void> {
+  const stats = await getStatisticsForGroup(group.id);
+  const crumbs = [locationShortLabel(group.locationId), group.name].join(" → ");
+  await respond(
+    target,
+    formatGroupStatsText(group.name, locationAddressLabel(group.locationId), stats, {
+      crumbs,
+    }),
+    statsGroupActionsKeyboard(group.locationId, group.id, { total: stats.length })
+  );
+}
+
+async function respond(
+  target: MessageTarget,
+  text: string,
+  keyboard?: InlineKeyboardMarkup
+): Promise<void> {
+  if (target.messageId !== undefined) {
+    await editMessageText(target.chatId, target.messageId, text, keyboard);
+    return;
+  }
+  await sendMessage(target.chatId, text, keyboard);
+}
+
 function assertLocationAccess(trainer: Trainer, locationId: string): void {
   if (!canAccessLocation(trainer, locationId)) {
     throw new Error(`Trainer ${trainer.telegramId} has no access to ${locationId}`);
@@ -564,10 +670,12 @@ async function assertGroupAccess(
   locationId: string,
   groupId: string
 ): Promise<void> {
-  assertLocationAccess(trainer, locationId);
   const group = await getGroup(groupId);
   if (!group || group.locationId !== locationId) {
     throw new Error(`Group ${groupId} does not belong to ${locationId}`);
+  }
+  if (!canAccessGroup(trainer, locationId, groupId)) {
+    throw new Error(`Trainer ${trainer.telegramId} has no access to group ${groupId}`);
   }
 }
 

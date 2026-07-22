@@ -1,4 +1,5 @@
 import { google, sheets_v4 } from "googleapis";
+import { filterGroupsForTrainer } from "./access";
 import { buildAttendanceRows } from "./attendance";
 import { buildSessionId } from "./callback";
 import {
@@ -132,7 +133,7 @@ function columnLetter(column: number): string {
 }
 
 export async function getTrainer(telegramId: number | string): Promise<Trainer | null> {
-  const rows = await readRows(SHEET_NAMES.trainers, "A2:D");
+  const rows = await readRows(SHEET_NAMES.trainers, "A2:E");
   const id = String(telegramId);
   const row = rows.find((item) => String(item[0] ?? "").trim() === id);
   if (!row) return null;
@@ -145,6 +146,10 @@ export async function getTrainer(telegramId: number | string): Promise<Trainer |
       .map((value) => value.trim())
       .filter(Boolean),
     active: isActive(row[3]),
+    groupIds: (row[4] ?? "")
+      .split(",")
+      .map((value) => value.trim())
+      .filter(Boolean),
   };
 }
 
@@ -159,6 +164,14 @@ export async function getGroupsForLocation(locationId: string): Promise<Training
     if (!unique.has(group.id)) unique.set(group.id, group);
   }
   return [...unique.values()];
+}
+
+/**
+ * Returns distinct active groups the trainer can access across locations.
+ */
+export async function getAccessibleGroups(trainer: Trainer): Promise<TrainingGroup[]> {
+  const rows = await readRows(SHEET_NAMES.groups, "A2:F");
+  return filterGroupsForTrainer(trainer, rows.map(rowToGroup));
 }
 
 export async function getGroup(groupId: string): Promise<TrainingGroup | null> {
