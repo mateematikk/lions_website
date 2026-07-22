@@ -9,6 +9,7 @@ import {
   attendanceCount,
   attendanceKeyboard,
   attendanceMarks,
+  addGroupsKeyboard,
   datesKeyboard,
   groupsKeyboard,
   locationsKeyboard,
@@ -39,9 +40,11 @@ import {
   addStudentToGroup,
 } from "./sheets";
 import {
+  buildAddGroupPickerText,
   buildAddStudentPrompt,
   normalizeStudentName,
   parseAddStudentContext,
+  parsePendingAddName,
 } from "./students";
 import {
   formatGroupStatsText,
@@ -364,6 +367,37 @@ async function handleCallback(query: CallbackQuery): Promise<void> {
       return;
     }
 
+    if (action.type === "add-pick-group") {
+      await assertGroupAccess(trainer, action.locationId, action.groupId);
+      const group = await getGroup(action.groupId);
+      if (!group) {
+        await answerCallbackQuery(query.id, "Групу не знайдено", true);
+        return;
+      }
+      const session: AttendanceSession = {
+        locationId: action.locationId,
+        groupId: action.groupId,
+        date: todayIsoKyiv(),
+        time: group.time || "00:00",
+      };
+      const pendingName = parsePendingAddName(message.text);
+      await answerCallbackQuery(query.id);
+      if (pendingName) {
+        await addStudentAndConfirm(message.chat.id, trainer, session, pendingName);
+        return;
+      }
+      await sendMessage(
+        message.chat.id,
+        buildAddStudentPrompt(session, group.name),
+        {
+          force_reply: true,
+          selective: true,
+          input_field_placeholder: "ПІБ учня",
+        }
+      );
+      return;
+    }
+
     if (action.type === "student" || action.type === "all") {
       if (!message.reply_markup) {
         await answerCallbackQuery(query.id, "Список застарів. Відкрийте меню знову", true);
@@ -589,45 +623,38 @@ async function handleAddCommand(
     );
     return;
   }
-  if (groups.length !== 1) {
-    await sendMessage(
-      message.chat.id,
-      [
-        "Команда <code>/add ПІБ</code> працює, коли у вас одна група.",
-        "Або відкрийте облік заняття і натисніть <b>➕ Додати учня</b>.",
-      ].join("\n"),
-      mainMenuKeyboard()
-    );
-    return;
-  }
 
-  const group = groups[0];
   const name = normalizeStudentName(rawName);
-  if (!name) {
+
+  if (groups.length === 1) {
+    const group = groups[0];
     const session: AttendanceSession = {
       locationId: group.locationId,
       groupId: group.id,
       date: todayIsoKyiv(),
       time: group.time || "00:00",
     };
-    await sendMessage(
-      message.chat.id,
-      buildAddStudentPrompt(session, group.name),
-      {
-        force_reply: true,
-        selective: true,
-        input_field_placeholder: "ПІБ учня",
-      }
-    );
+    if (!name) {
+      await sendMessage(
+        message.chat.id,
+        buildAddStudentPrompt(session, group.name),
+        {
+          force_reply: true,
+          selective: true,
+          input_field_placeholder: "ПІБ учня",
+        }
+      );
+      return;
+    }
+    await addStudentAndConfirm(message.chat.id, trainer, session, name);
     return;
   }
 
-  await addStudentAndConfirm(message.chat.id, trainer, {
-    locationId: group.locationId,
-    groupId: group.id,
-    date: todayIsoKyiv(),
-    time: group.time || "00:00",
-  }, name);
+  await sendMessage(
+    message.chat.id,
+    buildAddGroupPickerText(name),
+    addGroupsKeyboard(groups)
+  );
 }
 
 async function handleAddStudentName(

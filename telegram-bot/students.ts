@@ -46,6 +46,29 @@ export function parseAddStudentContext(text?: string): AttendanceSession | null 
 }
 
 /**
+ * Builds the multi-group picker text for /add.
+ */
+export function buildAddGroupPickerText(pendingName?: string | null): string {
+  const lines = ["<b>➕ Новий учень</b>"];
+  if (pendingName) {
+    lines.push(`ПІБ: <b>${escapeHtml(pendingName)}</b>`);
+  }
+  lines.push("", "Оберіть групу:");
+  return lines.join("\n");
+}
+
+/**
+ * Reads a pending name from an /add group-picker message.
+ */
+export function parsePendingAddName(text?: string): string | null {
+  if (!text) return null;
+  const match = text.match(/ПІБ:\s*(.+)/i);
+  if (!match) return null;
+  const raw = (match[1].split("\n")[0] ?? "").replace(/<[^>]+>/g, "");
+  return normalizeStudentName(raw);
+}
+
+/**
  * Normalizes a student display name from free text.
  */
 export function normalizeStudentName(raw: string): string | null {

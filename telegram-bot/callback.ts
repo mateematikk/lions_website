@@ -14,6 +14,7 @@ export type BotAction =
   | { type: "all"; present: boolean }
   | { type: "finish"; session: AttendanceSession }
   | { type: "add-student"; session: AttendanceSession }
+  | { type: "add-pick-group"; locationId: string; groupId: string }
   | { type: "stats-location"; locationId: string }
   | { type: "stats-group"; locationId: string; groupId: string }
   | { type: "stats-all"; locationId: string; groupId: string; page: number }
@@ -104,6 +105,8 @@ export const callbackData = {
         compactTime(session.time),
       ].join(SEPARATOR)
     ),
+  addPickGroup: (locationId: string, groupId: string) =>
+    assertTelegramLimit(["AG", safePart(locationId), safePart(groupId)].join(SEPARATOR)),
   statsLocation: (locationId: string) =>
     assertTelegramLimit(["SL", safePart(locationId)].join(SEPARATOR)),
   statsGroup: (locationId: string, groupId: string) =>
@@ -168,6 +171,9 @@ export function parseCallbackData(data: string): BotAction {
   }
   if (action === "A" && parts.length === 2) {
     return { type: "all", present: parts[1] === "1" };
+  }
+  if (action === "AG" && parts.length === 3) {
+    return { type: "add-pick-group", locationId: parts[1], groupId: parts[2] };
   }
   if (action === "SL" && parts.length === 2) {
     return { type: "stats-location", locationId: parts[1] };

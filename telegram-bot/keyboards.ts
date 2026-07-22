@@ -266,6 +266,17 @@ export function savedSessionKeyboard(
   };
 }
 
+/** Group picker for /add when the trainer has several groups. */
+export function addGroupsKeyboard(groups: TrainingGroup[]): InlineKeyboardMarkup {
+  const buttons = groups.map((group) => ({
+    text: `${locationShortLabel(group.locationId)} · ${groupButtonLabel(group.name)}`,
+    callback_data: callbackData.addPickGroup(group.locationId, group.id),
+  }));
+  return {
+    inline_keyboard: [...chunkButtons(buttons, 1), menuRow(), cancelRow()],
+  };
+}
+
 export function datesKeyboard(
   locationId: string,
   groupId: string,

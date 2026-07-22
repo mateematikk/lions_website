@@ -89,6 +89,11 @@ test("stats callback data round-trips", () => {
     type: "add-student",
     session,
   });
+  assert.deepEqual(parseCallbackData(callbackData.addPickGroup("pozniaky", "poz-adults")), {
+    type: "add-pick-group",
+    locationId: "pozniaky",
+    groupId: "poz-adults",
+  });
 });
 
 test("callback parser rejects malformed data", () => {
@@ -308,13 +313,20 @@ test("UI helpers shorten locations and decorate groups", async () => {
 
 test("add-student prompt round-trips session and validates names", async () => {
   const {
+    buildAddGroupPickerText,
     buildAddStudentPrompt,
     normalizeStudentName,
     parseAddStudentContext,
+    parsePendingAddName,
   } = await import("../students");
   const prompt = buildAddStudentPrompt(session, "Дорослі");
   assert.deepEqual(parseAddStudentContext(prompt), session);
   assert.equal(normalizeStudentName("  Іван   Петренко "), "Іван Петренко");
   assert.equal(normalizeStudentName("а"), null);
   assert.equal(normalizeStudentName("/start"), null);
+  assert.equal(
+    parsePendingAddName(buildAddGroupPickerText("Іван Петренко")),
+    "Іван Петренко"
+  );
+  assert.equal(parsePendingAddName(buildAddGroupPickerText(null)), null);
 });
