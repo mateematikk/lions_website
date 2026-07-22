@@ -1,5 +1,5 @@
 import { requireEnv } from "./config";
-import type { ReplyMarkup } from "./types";
+import type { InlineKeyboardMarkup, ReplyMarkup } from "./types";
 
 interface TelegramResponse<T> {
   ok: boolean;
