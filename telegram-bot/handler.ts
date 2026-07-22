@@ -241,6 +241,12 @@ async function handleCallback(query: CallbackQuery): Promise<void> {
       return;
     }
 
+    if (action.type === "menu-add") {
+      await answerCallbackQuery(query.id);
+      await presentAddStudentStart(target, trainer);
+      return;
+    }
+
     if (action.type === "location") {
       assertLocationAccess(trainer, action.locationId);
       const groups = filterGroupsForTrainer(
@@ -614,17 +620,24 @@ async function handleAddCommand(
   trainer: Trainer
 ): Promise<void> {
   const rawName = message.text?.replace(/^\/add(?:@\w+)?\s*/i, "") ?? "";
+  const name = normalizeStudentName(rawName);
+  await presentAddStudentStart({ chatId: message.chat.id }, trainer, name);
+}
+
+async function presentAddStudentStart(
+  target: MessageTarget,
+  trainer: Trainer,
+  pendingName?: string | null
+): Promise<void> {
   const groups = await getAccessibleGroups(trainer);
   if (!groups.length) {
-    await sendMessage(
-      message.chat.id,
+    await respond(
+      target,
       "Немає доступних груп для вашого профілю.",
       mainMenuKeyboard()
     );
     return;
   }
-
-  const name = normalizeStudentName(rawName);
 
   if (groups.length === 1) {
     const group = groups[0];
@@ -634,25 +647,25 @@ async function handleAddCommand(
       date: todayIsoKyiv(),
       time: group.time || "00:00",
     };
-    if (!name) {
-      await sendMessage(
-        message.chat.id,
-        buildAddStudentPrompt(session, group.name),
-        {
-          force_reply: true,
-          selective: true,
-          input_field_placeholder: "ПІБ учня",
-        }
-      );
+    if (pendingName) {
+      await addStudentAndConfirm(target.chatId, trainer, session, pendingName);
       return;
     }
-    await addStudentAndConfirm(message.chat.id, trainer, session, name);
+    await sendMessage(
+      target.chatId,
+      buildAddStudentPrompt(session, group.name),
+      {
+        force_reply: true,
+        selective: true,
+        input_field_placeholder: "ПІБ учня",
+      }
+    );
     return;
   }
 
-  await sendMessage(
-    message.chat.id,
-    buildAddGroupPickerText(name),
+  await respond(
+    target,
+    buildAddGroupPickerText(pendingName),
     addGroupsKeyboard(groups)
   );
 }

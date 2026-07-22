@@ -6,6 +6,7 @@ export type BotAction =
   | { type: "menu-home" }
   | { type: "menu-attendance" }
   | { type: "menu-stats" }
+  | { type: "menu-add" }
   | { type: "location"; locationId: string }
   | { type: "group"; locationId: string; groupId: string }
   | { type: "date"; locationId: string; groupId: string; date: string }
@@ -64,6 +65,7 @@ export const callbackData = {
   menuHome: () => "M|H",
   menuAttendance: () => "M|A",
   menuStats: () => "M|S",
+  menuAdd: () => "M|N",
   location: (locationId: string) =>
     assertTelegramLimit(["L", safePart(locationId)].join(SEPARATOR)),
   group: (locationId: string, groupId: string) =>
@@ -138,6 +140,7 @@ export function parseCallbackData(data: string): BotAction {
     if (parts[1] === "H") return { type: "menu-home" };
     if (parts[1] === "A") return { type: "menu-attendance" };
     if (parts[1] === "S") return { type: "menu-stats" };
+    if (parts[1] === "N") return { type: "menu-add" };
     return { type: "unknown" };
   }
   if (action === "L" && parts.length === 2) {

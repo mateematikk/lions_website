@@ -52,6 +52,7 @@ export function mainMenuKeyboard(): InlineKeyboardMarkup {
         { text: "✅ Облік", callback_data: callbackData.menuAttendance() },
         { text: "📊 Статистика", callback_data: callbackData.menuStats() },
       ],
+      [{ text: "➕ Додати учня", callback_data: callbackData.menuAdd() }],
     ],
   };
 }

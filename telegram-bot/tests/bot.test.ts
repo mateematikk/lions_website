@@ -82,6 +82,9 @@ test("stats callback data round-trips", () => {
   assert.deepEqual(parseCallbackData(callbackData.menuStats()), {
     type: "menu-stats",
   });
+  assert.deepEqual(parseCallbackData(callbackData.menuAdd()), {
+    type: "menu-add",
+  });
   assert.deepEqual(parseCallbackData(callbackData.menuHome()), {
     type: "menu-home",
   });
