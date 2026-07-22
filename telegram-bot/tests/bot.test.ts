@@ -144,6 +144,42 @@ test("group_ids restrict trainer groups and enable single-group shortcut", () =>
   assert.equal(canAccessGroup(yura, "pozniaky", "poz-adults"), true);
 });
 
+test("schedule helpers keep only training weekdays and times", async () => {
+  const { getScheduledDates, getTimesForDate, matchesGroupDay } = await import(
+    "../schedule"
+  );
+  assert.equal(matchesGroupDay("Вівторок", "2026-07-21"), true); // Tuesday
+  assert.equal(matchesGroupDay("Вівторок", "2026-07-22"), false); // Wednesday
+
+  const rows: TrainingGroup[] = [
+    {
+      id: "poz-adults",
+      locationId: "pozniaky",
+      name: "Дорослі",
+      day: "Вівторок",
+      time: "20:00",
+      active: true,
+    },
+    {
+      id: "poz-adults",
+      locationId: "pozniaky",
+      name: "Дорослі",
+      day: "Четвер",
+      time: "20:00",
+      active: true,
+    },
+  ];
+
+  assert.deepEqual(getTimesForDate(rows, "2026-07-21"), ["20:00"]);
+  assert.deepEqual(getTimesForDate(rows, "2026-07-22"), []);
+
+  const dates = getScheduledDates(rows, 7);
+  for (const iso of dates) {
+    const day = new Date(`${iso}T12:00:00`).getDay();
+    assert.ok(day === 2 || day === 4, `unexpected weekday for ${iso}`);
+  }
+});
+
 test("attendance keyboard toggles one student and all students", () => {
   const keyboard = attendanceKeyboard(students, session);
   const oneSelected = toggleStudent(keyboard, "s-1");

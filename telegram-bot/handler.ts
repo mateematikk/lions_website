@@ -27,6 +27,7 @@ import {
 import {
   getAccessibleGroups,
   getGroup,
+  getGroupSessionDates,
   getGroupsForLocation,
   getSessionTimes,
   getStatisticsForGroup,
@@ -248,9 +249,38 @@ async function handleCallback(query: CallbackQuery): Promise<void> {
 
     if (action.type === "date") {
       await assertGroupAccess(trainer, action.locationId, action.groupId);
-      const group = await getGroup(action.groupId);
-      const times = await getSessionTimes(action.groupId, action.date);
+      const [group, times] = await Promise.all([
+        getGroup(action.groupId),
+        getSessionTimes(action.groupId, action.date),
+      ]);
       await answerCallbackQuery(query.id);
+      if (!times.length) {
+        await respond(
+          target,
+          [
+            formatFlowHeader({
+              title: "Облік відвідуваності",
+              crumbs: [
+                locationShortLabel(action.locationId),
+                group?.name ?? action.groupId,
+                formatUiDate(action.date),
+              ],
+              hint: "На цю дату в розкладі немає часу заняття.",
+            }),
+          ].join("\n"),
+          mainMenuKeyboard()
+        );
+        return;
+      }
+      if (times.length === 1) {
+        await presentAttendanceMarking(target, {
+          locationId: action.locationId,
+          groupId: action.groupId,
+          date: action.date,
+          time: times[0],
+        });
+        return;
+      }
       await editMessageText(
         message.chat.id,
         message.message_id,
@@ -276,37 +306,8 @@ async function handleCallback(query: CallbackQuery): Promise<void> {
         action.session.locationId,
         action.session.groupId
       );
-      const [group, students] = await Promise.all([
-        getGroup(action.session.groupId),
-        getStudentsForGroup(action.session.groupId),
-      ]);
-      if (!students.length) {
-        await answerCallbackQuery(query.id, "У цій групі ще немає учнів", true);
-        return;
-      }
-      if (students.length > 90) {
-        await answerCallbackQuery(
-          query.id,
-          "У групі понад 90 учнів. Розділіть її на менші групи.",
-          true
-        );
-        return;
-      }
-      const keyboard = attendanceKeyboard(students, action.session);
       await answerCallbackQuery(query.id);
-      await editMessageText(
-        message.chat.id,
-        message.message_id,
-        attendanceText(
-          action.session.locationId,
-          group?.name ?? action.session.groupId,
-          action.session.date,
-          action.session.time,
-          0,
-          students.length
-        ),
-        keyboard
-      );
+      await presentAttendanceMarking(target, action.session);
       return;
     }
 
@@ -618,6 +619,24 @@ async function presentDatePicker(
   target: MessageTarget,
   group: TrainingGroup
 ): Promise<void> {
+  const dates = await getGroupSessionDates(group.id);
+  if (!dates.length) {
+    await respond(
+      target,
+      [
+        formatFlowHeader({
+          title: "Облік відвідуваності",
+          crumbs: [locationShortLabel(group.locationId), group.name],
+          address: locationAddressLabel(group.locationId),
+          hint:
+            "За розкладом у таблиці «Групи» немає днів занять за останні 14 днів. Перевірте колонку «день».",
+        }),
+      ].join("\n"),
+      mainMenuKeyboard()
+    );
+    return;
+  }
+
   await respond(
     target,
     formatFlowHeader({
@@ -626,9 +645,53 @@ async function presentDatePicker(
       steps: ATTENDANCE_STEPS,
       crumbs: [locationShortLabel(group.locationId), group.name],
       address: locationAddressLabel(group.locationId),
-      hint: "Оберіть дату заняття:",
+      hint: "Оберіть дату заняття (лише дні з розкладу):",
     }),
-    datesKeyboard(group.locationId, group.id)
+    datesKeyboard(group.locationId, group.id, dates)
+  );
+}
+
+async function presentAttendanceMarking(
+  target: MessageTarget,
+  session: {
+    locationId: string;
+    groupId: string;
+    date: string;
+    time: string;
+  }
+): Promise<void> {
+  const [group, students] = await Promise.all([
+    getGroup(session.groupId),
+    getStudentsForGroup(session.groupId),
+  ]);
+  if (!students.length) {
+    await respond(
+      target,
+      "У цій групі ще немає учнів.",
+      mainMenuKeyboard()
+    );
+    return;
+  }
+  if (students.length > 90) {
+    await respond(
+      target,
+      "У групі понад 90 учнів. Розділіть її на менші групи.",
+      mainMenuKeyboard()
+    );
+    return;
+  }
+
+  await respond(
+    target,
+    attendanceText(
+      session.locationId,
+      group?.name ?? session.groupId,
+      session.date,
+      session.time,
+      0,
+      students.length
+    ),
+    attendanceKeyboard(students, session)
   );
 }
 

@@ -9,6 +9,7 @@ import {
   SHEET_NAMES,
 } from "./config";
 import { rowToStudentStat } from "./stats";
+import { getScheduledDates, getTimesForDate } from "./schedule";
 import type {
   AttendanceMark,
   AttendanceSession,
@@ -190,26 +191,19 @@ function rowToGroup(row: string[]): TrainingGroup {
   };
 }
 
-const DAY_ALIASES: Record<number, string[]> = {
-  0: ["0", "7", "sun", "sunday", "нд", "неділя"],
-  1: ["1", "mon", "monday", "пн", "понеділок"],
-  2: ["2", "tue", "tuesday", "вт", "вівторок"],
-  3: ["3", "wed", "wednesday", "ср", "середа"],
-  4: ["4", "thu", "thursday", "чт", "четвер"],
-  5: ["5", "fri", "friday", "пт", "п'ятниця", "пятниця"],
-  6: ["6", "sat", "saturday", "сб", "субота"],
-};
-
 export async function getSessionTimes(groupId: string, date: string): Promise<string[]> {
   const rows = await readRows(SHEET_NAMES.groups, "A2:F");
   const groups = rows.map(rowToGroup).filter((group) => group.active && group.id === groupId);
-  const day = new Date(`${date}T12:00:00`).getDay();
-  const aliases = DAY_ALIASES[day];
-  const matching = groups.filter(
-    (group) => !group.day || aliases.includes(group.day.toLowerCase())
-  );
-  const source = matching.length ? matching : groups;
-  return [...new Set(source.map((group) => group.time).filter(Boolean))].sort();
+  return getTimesForDate(groups, date);
+}
+
+/**
+ * Returns recent calendar dates that match the group's schedule in Групи.
+ */
+export async function getGroupSessionDates(groupId: string): Promise<string[]> {
+  const rows = await readRows(SHEET_NAMES.groups, "A2:F");
+  const groups = rows.map(rowToGroup).filter((group) => group.active && group.id === groupId);
+  return getScheduledDates(groups);
 }
 
 export async function getStudentsForGroup(groupId: string): Promise<Student[]> {

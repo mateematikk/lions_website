@@ -266,22 +266,30 @@ export function savedSessionKeyboard(
   };
 }
 
-export function datesKeyboard(locationId: string, groupId: string): InlineKeyboardMarkup {
-  const dates = Array.from({ length: 7 }, (_, index) => {
-    const date = new Date();
-    date.setHours(12, 0, 0, 0);
-    date.setDate(date.getDate() - index);
-    return date;
-  });
+export function datesKeyboard(
+  locationId: string,
+  groupId: string,
+  dates: string[]
+): InlineKeyboardMarkup {
+  const today = toIsoDate(new Date());
+  const yesterdayDate = new Date();
+  yesterdayDate.setHours(12, 0, 0, 0);
+  yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+  const yesterday = toIsoDate(yesterdayDate);
 
   return {
     inline_keyboard: [
-      ...dates.map((date, index) => [
-        {
-          text: `${index === 0 ? "Сьогодні · " : index === 1 ? "Учора · " : ""}${formatDateLabel(date)}`,
-          callback_data: callbackData.date(locationId, groupId, toIsoDate(date)),
-        },
-      ]),
+      ...dates.map((iso) => {
+        const date = new Date(`${iso}T12:00:00`);
+        const prefix =
+          iso === today ? "Сьогодні · " : iso === yesterday ? "Учора · " : "";
+        return [
+          {
+            text: `${prefix}${formatDateLabel(date)}`,
+            callback_data: callbackData.date(locationId, groupId, iso),
+          },
+        ];
+      }),
       menuRow(),
       cancelRow(),
     ],
@@ -294,17 +302,13 @@ export function timesKeyboard(
   date: string,
   times: string[]
 ): InlineKeyboardMarkup {
-  const now = new Date();
-  const currentTime = `${String(now.getHours()).padStart(2, "0")}:${String(
-    now.getMinutes()
-  ).padStart(2, "0")}`;
-  const uniqueTimes = [...new Set([...times, currentTime])];
+  const uniqueTimes = [...new Set(times.filter(Boolean))].sort();
 
   return {
     inline_keyboard: [
       ...uniqueTimes.map((time) => [
         {
-          text: time === currentTime ? `Зараз · ${time}` : time,
+          text: time,
           callback_data: callbackData.time({ locationId, groupId, date, time }),
         },
       ]),
