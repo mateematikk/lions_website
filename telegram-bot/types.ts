@@ -23,7 +23,17 @@ export interface TelegramMessage {
   from?: TelegramUser;
   text?: string;
   reply_markup?: InlineKeyboardMarkup;
+  reply_to_message?: TelegramMessage;
 }
+
+/** Telegram force_reply markup for collecting free-text answers. */
+export interface ForceReplyMarkup {
+  force_reply: true;
+  selective?: boolean;
+  input_field_placeholder?: string;
+}
+
+export type ReplyMarkup = InlineKeyboardMarkup | ForceReplyMarkup;
 
 export interface CallbackQuery {
   id: string;

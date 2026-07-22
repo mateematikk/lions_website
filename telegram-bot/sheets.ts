@@ -220,6 +220,47 @@ export async function getStudentsForGroup(groupId: string): Promise<Student[]> {
 }
 
 /**
+ * Allocates the next s-NNN student id from the Учні sheet.
+ */
+export async function allocateStudentId(): Promise<string> {
+  const rows = await readRows(SHEET_NAMES.students, "A2:A");
+  let max = 0;
+  for (const row of rows) {
+    const match = /^s-(\d+)$/i.exec(String(row[0] ?? "").trim());
+    if (match) max = Math.max(max, Number(match[1]));
+  }
+  return `s-${String(max + 1).padStart(3, "0")}`;
+}
+
+/**
+ * Appends a new active student to the Учні sheet.
+ */
+export async function addStudentToGroup(
+  name: string,
+  groupId: string
+): Promise<Student> {
+  await initializeWorkbook();
+  const existing = await getStudentsForGroup(groupId);
+  const duplicate = existing.find(
+    (student) => student.name.localeCompare(name, "uk", { sensitivity: "accent" }) === 0
+  );
+  if (duplicate) {
+    throw new Error(`STUDENT_EXISTS:${duplicate.id}`);
+  }
+
+  const id = await allocateStudentId();
+  const student: Student = { id, name, groupId, active: true };
+  await getSheetsClient().spreadsheets.values.append({
+    spreadsheetId: spreadsheetId(),
+    range: `${quoteSheet(SHEET_NAMES.students)}!A:D`,
+    valueInputOption: "RAW",
+    insertDataOption: "INSERT_ROWS",
+    requestBody: { values: [[id, name, groupId, "TRUE"]] },
+  });
+  return student;
+}
+
+/**
  * Reads aggregated statistics for every student in a group.
  */
 export async function getStatisticsForGroup(groupId: string): Promise<StudentStat[]> {

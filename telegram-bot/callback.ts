@@ -13,6 +13,7 @@ export type BotAction =
   | { type: "student"; studentId: string; present: boolean }
   | { type: "all"; present: boolean }
   | { type: "finish"; session: AttendanceSession }
+  | { type: "add-student"; session: AttendanceSession }
   | { type: "stats-location"; locationId: string }
   | { type: "stats-group"; locationId: string; groupId: string }
   | { type: "stats-all"; locationId: string; groupId: string; page: number }
@@ -93,6 +94,16 @@ export const callbackData = {
         compactTime(session.time),
       ].join(SEPARATOR)
     ),
+  addStudent: (session: AttendanceSession) =>
+    assertTelegramLimit(
+      [
+        "N",
+        safePart(session.locationId),
+        safePart(session.groupId),
+        compactDate(session.date),
+        compactTime(session.time),
+      ].join(SEPARATOR)
+    ),
   statsLocation: (locationId: string) =>
     assertTelegramLimit(["SL", safePart(locationId)].join(SEPARATOR)),
   statsGroup: (locationId: string, groupId: string) =>
@@ -138,7 +149,7 @@ export function parseCallbackData(data: string): BotAction {
       ? { type: "date", locationId: parts[1], groupId: parts[2], date }
       : { type: "unknown" };
   }
-  if ((action === "T" || action === "F") && parts.length === 5) {
+  if ((action === "T" || action === "F" || action === "N") && parts.length === 5) {
     const date = expandDate(parts[3]);
     const time = expandTime(parts[4]);
     if (!date || !time) return { type: "unknown" };
@@ -148,7 +159,9 @@ export function parseCallbackData(data: string): BotAction {
       date,
       time,
     };
-    return action === "T" ? { type: "time", session } : { type: "finish", session };
+    if (action === "T") return { type: "time", session };
+    if (action === "N") return { type: "add-student", session };
+    return { type: "finish", session };
   }
   if (action === "S" && parts.length === 3) {
     return { type: "student", studentId: parts[1], present: parts[2] === "1" };

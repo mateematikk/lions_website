@@ -348,6 +348,12 @@ export function attendanceKeyboard(
           callback_data: callbackData.finish(session),
         },
       ],
+      [
+        {
+          text: "➕ Додати учня",
+          callback_data: callbackData.addStudent(session),
+        },
+      ],
       menuRow(),
       cancelRow(),
     ],

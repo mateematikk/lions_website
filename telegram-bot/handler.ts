@@ -36,7 +36,13 @@ import {
   getTrainer,
   initializeWorkbook,
   saveAttendance,
+  addStudentToGroup,
 } from "./sheets";
+import {
+  buildAddStudentPrompt,
+  normalizeStudentName,
+  parseAddStudentContext,
+} from "./students";
 import {
   formatGroupStatsText,
   formatStudentStatsText,
@@ -47,6 +53,7 @@ import {
   sendMessage,
 } from "./telegram";
 import type {
+  AttendanceSession,
   CallbackQuery,
   InlineKeyboardMarkup,
   TelegramMessage,
@@ -86,7 +93,8 @@ async function handleMessage(message: TelegramMessage): Promise<void> {
     if (
       message.text.startsWith("/start") ||
       message.text.startsWith("/stats") ||
-      message.text.startsWith("/attendance")
+      message.text.startsWith("/attendance") ||
+      message.text.startsWith("/add")
     ) {
       await sendMessage(
         message.chat.id,
@@ -96,13 +104,33 @@ async function handleMessage(message: TelegramMessage): Promise<void> {
     return;
   }
 
+  await initializeWorkbook();
+  const trainer = await getTrainer(message.from.id);
+
+  const addSession = parseAddStudentContext(message.reply_to_message?.text);
+  if (addSession) {
+    if (!trainer?.active) {
+      await sendMessage(
+        message.chat.id,
+        [
+          "<b>Доступ не налаштовано.</b>",
+          "",
+          "Передайте адміністратору ваш Telegram ID:",
+          `<code>${message.from.id}</code>`,
+        ].join("\n")
+      );
+      return;
+    }
+    await handleAddStudentName(message, trainer, addSession);
+    return;
+  }
+
   const isStart = message.text.startsWith("/start");
   const isAttendance = message.text.startsWith("/attendance");
   const isStats = message.text.startsWith("/stats");
-  if (!isStart && !isAttendance && !isStats) return;
+  const isAdd = message.text.startsWith("/add");
+  if (!isStart && !isAttendance && !isStats && !isAdd) return;
 
-  await initializeWorkbook();
-  const trainer = await getTrainer(message.from.id);
   if (!trainer?.active) {
     await sendMessage(
       message.chat.id,
@@ -121,6 +149,11 @@ async function handleMessage(message: TelegramMessage): Promise<void> {
       message.chat.id,
       "Для вашого профілю не вказано жодної локації. Зверніться до адміністратора."
     );
+    return;
+  }
+
+  if (isAdd) {
+    await handleAddCommand(message, trainer);
     return;
   }
 
@@ -308,6 +341,26 @@ async function handleCallback(query: CallbackQuery): Promise<void> {
       );
       await answerCallbackQuery(query.id);
       await presentAttendanceMarking(target, action.session);
+      return;
+    }
+
+    if (action.type === "add-student") {
+      await assertGroupAccess(
+        trainer,
+        action.session.locationId,
+        action.session.groupId
+      );
+      const group = await getGroup(action.session.groupId);
+      await answerCallbackQuery(query.id);
+      await sendMessage(
+        message.chat.id,
+        buildAddStudentPrompt(action.session, group?.name ?? action.session.groupId),
+        {
+          force_reply: true,
+          selective: true,
+          input_field_placeholder: "ПІБ учня",
+        }
+      );
       return;
     }
 
@@ -519,6 +572,114 @@ async function handleCallback(query: CallbackQuery): Promise<void> {
       message.chat.id,
       "Не вдалося виконати дію. Надішліть /start або зверніться до адміністратора."
     ).catch(() => undefined);
+  }
+}
+
+async function handleAddCommand(
+  message: TelegramMessage,
+  trainer: Trainer
+): Promise<void> {
+  const rawName = message.text?.replace(/^\/add(?:@\w+)?\s*/i, "") ?? "";
+  const groups = await getAccessibleGroups(trainer);
+  if (!groups.length) {
+    await sendMessage(
+      message.chat.id,
+      "Немає доступних груп для вашого профілю.",
+      mainMenuKeyboard()
+    );
+    return;
+  }
+  if (groups.length !== 1) {
+    await sendMessage(
+      message.chat.id,
+      [
+        "Команда <code>/add ПІБ</code> працює, коли у вас одна група.",
+        "Або відкрийте облік заняття і натисніть <b>➕ Додати учня</b>.",
+      ].join("\n"),
+      mainMenuKeyboard()
+    );
+    return;
+  }
+
+  const group = groups[0];
+  const name = normalizeStudentName(rawName);
+  if (!name) {
+    const session: AttendanceSession = {
+      locationId: group.locationId,
+      groupId: group.id,
+      date: todayIsoKyiv(),
+      time: group.time || "00:00",
+    };
+    await sendMessage(
+      message.chat.id,
+      buildAddStudentPrompt(session, group.name),
+      {
+        force_reply: true,
+        selective: true,
+        input_field_placeholder: "ПІБ учня",
+      }
+    );
+    return;
+  }
+
+  await addStudentAndConfirm(message.chat.id, trainer, {
+    locationId: group.locationId,
+    groupId: group.id,
+    date: todayIsoKyiv(),
+    time: group.time || "00:00",
+  }, name);
+}
+
+async function handleAddStudentName(
+  message: TelegramMessage,
+  trainer: Trainer,
+  session: AttendanceSession
+): Promise<void> {
+  await assertGroupAccess(trainer, session.locationId, session.groupId);
+  const name = normalizeStudentName(message.text ?? "");
+  if (!name) {
+    await sendMessage(
+      message.chat.id,
+      "Надішліть коректне ПІБ (2–80 символів) у відповідь на запит додавання."
+    );
+    return;
+  }
+  await addStudentAndConfirm(message.chat.id, trainer, session, name);
+}
+
+async function addStudentAndConfirm(
+  chatId: number,
+  trainer: Trainer,
+  session: AttendanceSession,
+  name: string
+): Promise<void> {
+  try {
+    const student = await addStudentToGroup(name, session.groupId);
+    const group = await getGroup(session.groupId);
+    await sendMessage(
+      chatId,
+      [
+        "<b>✅ Учня додано</b>",
+        `${escapeHtml(student.name)} · <code>${escapeHtml(student.id)}</code>`,
+        `Група: ${escapeHtml(group?.name ?? session.groupId)}`,
+      ].join("\n")
+    );
+    await presentAttendanceMarking({ chatId }, session);
+  } catch (error) {
+    const text = error instanceof Error ? error.message : String(error);
+    if (text.startsWith("STUDENT_EXISTS:")) {
+      await sendMessage(
+        chatId,
+        `Учень <b>${escapeHtml(name)}</b> уже є в цій групі.`
+      );
+      await presentAttendanceMarking({ chatId }, session);
+      return;
+    }
+    console.error("Add student failed:", error);
+    await sendMessage(
+      chatId,
+      "Не вдалося додати учня. Спробуйте ще раз або зверніться до адміністратора."
+    );
   }
 }
 
@@ -763,4 +924,13 @@ function attendanceText(
     `<b>Присутні: ${selected}/${total}</b>`,
     "Натисніть на учнів, які були присутні.",
   ].join("\n");
+}
+
+function todayIsoKyiv(): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Kyiv",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
 }

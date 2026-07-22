@@ -1,5 +1,5 @@
 import { requireEnv } from "./config";
-import type { InlineKeyboardMarkup } from "./types";
+import type { ReplyMarkup } from "./types";
 
 interface TelegramResponse<T> {
   ok: boolean;
@@ -29,7 +29,7 @@ async function callTelegram<T>(
 export function sendMessage(
   chatId: number,
   text: string,
-  replyMarkup?: InlineKeyboardMarkup
+  replyMarkup?: ReplyMarkup
 ) {
   return callTelegram("sendMessage", {
     chat_id: chatId,

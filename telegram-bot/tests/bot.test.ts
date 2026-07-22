@@ -85,6 +85,10 @@ test("stats callback data round-trips", () => {
   assert.deepEqual(parseCallbackData(callbackData.menuHome()), {
     type: "menu-home",
   });
+  assert.deepEqual(parseCallbackData(callbackData.addStudent(session)), {
+    type: "add-student",
+    session,
+  });
 });
 
 test("callback parser rejects malformed data", () => {
@@ -300,4 +304,17 @@ test("UI helpers shorten locations and decorate groups", async () => {
   assert.equal(rateMarker(95), "🟢");
   assert.equal(rateMarker(75), "🟡");
   assert.equal(rateMarker(20), "🔴");
+});
+
+test("add-student prompt round-trips session and validates names", async () => {
+  const {
+    buildAddStudentPrompt,
+    normalizeStudentName,
+    parseAddStudentContext,
+  } = await import("../students");
+  const prompt = buildAddStudentPrompt(session, "Дорослі");
+  assert.deepEqual(parseAddStudentContext(prompt), session);
+  assert.equal(normalizeStudentName("  Іван   Петренко "), "Іван Петренко");
+  assert.equal(normalizeStudentName("а"), null);
+  assert.equal(normalizeStudentName("/start"), null);
 });
